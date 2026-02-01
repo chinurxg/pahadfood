@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pahad Food - Partner Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            padding-bottom: 70px;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-logo {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+
+        .login-form {
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            background: #ffffff;
+            color: #1a1a1a;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: #ffffff;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-bar-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .top-bar-user {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: 1px solid #e0e0e0;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-left: 12px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            height: 60px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            color: #1a1a1a;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        /* Orders Section */
+        .orders-section {
+            padding: 16px;
+        }
+
+        .section-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .order-card {
+            background: #ffffff;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .order-id {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .order-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .order-amount {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .order-items {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .order-item {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .order-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .customer-info {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .customer-name {
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            color: #1a1a1a;
+        }
+
+        .btn-action.primary {
+            background: #1a1a1a;
+            color: #ffffff;
+            border-color: #1a1a1a;
+        }
+
+        .btn-action.danger {
+            color: #d32f2f;
+            border-color: #d32f2f;
+        }
+
+        .btn-action:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* History Section */
+        .history-section {
+            padding: 16px;
+        }
+
+        .stats-card {
+            background: #f8f8f8;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .stats-header {
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .stat-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            color: #666;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .user-details {
+            background: #ffffff;
+            border: 1px solid #f0f0f0;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .detail-row {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .btn-pay {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-pay:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .modal-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .modal-body {
+            margin-bottom: 16px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-modal.primary {
+            background: #1a1a1a;
+            color: #ffffff;
+            border-color: #1a1a1a;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 4px 8px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .status-badge.preparing {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-badge.current {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Call Button */
+        .btn-call {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+
+        .address-info {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .address-label {
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-logo">PAHAD FOOD</div>
+        <form class="login-form" id="loginForm">
+            <div class="form-group">
+                <label>Role</label>
+                <select id="loginRole" required>
+                    <option value="">Select your role</option>
+                    <option value="chef">Chef</option>
+                    <option value="delivery">Delivery Partner</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="loginPhone" required placeholder="10-digit mobile number" pattern="[0-9]{10}">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" required placeholder="Enter password">
+            </div>
+            <button type="submit" class="btn-login">Login</button>
+        </form>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div>
+                <div class="top-bar-title">PAHAD FOOD</div>
+                <div class="top-bar-user" id="userName"></div>
+            </div>
+            <button class="btn-logout" id="logoutBtn">Logout</button>
+        </div>
+
+        <!-- Orders Section -->
+        <div id="ordersSection" class="orders-section">
+            <!-- Content will be dynamically rendered based on role -->
+        </div>
+
+        <!-- History Section -->
+        <div id="historySection" class="history-section hidden">
+            <!-- Content will be dynamically rendered based on role -->
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" data-tab="orders">
+                <div class="nav-icon">📦</div>
+                <div>Orders</div>
+            </div>
+            <div class="nav-item" data-tab="history">
+                <div class="nav-icon">📊</div>
+                <div>History</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejection Reason Modal -->
+    <div class="modal" id="rejectModal">
+        <div class="modal-content">
+            <div class="modal-header">Reject Order</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Reason for rejection</label>
+                    <select id="rejectReason">
+                        <option value="Out of ingredients">Out of ingredients</option>
+                        <option value="Too busy">Too busy</option>
+                        <option value="Closing soon">Closing soon</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-modal" id="cancelReject">Cancel</button>
+                <button class="btn-modal primary" id="confirmReject">Reject & Call</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+// Import Firebase SDK
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js';
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAGYjiyPqt7sNAFND9I22AIs7wGh6gB7pQ",
+  authDomain: "pahadfood.firebaseapp.com",
+  projectId: "pahadfood",
+  storageBucket: "pahadfood.firebasestorage.app",
+  messagingSenderId: "93650163842",
+  appId: "1:93650163842:android:afe5f5016e4410fa6ebc9b"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+// Your VAPID key from Firebase Console
+const VAPID_KEY = 'BJCgA4WI7ZNbRXF86toihrZbLABf0XURwSMNXxMQZXnxDJLSkk61cWQ2lJbOFzvrrkWeH-H-DZakZzMQ30adlws'; // Replace with your actual VAPID key
+
+// Request notification permission for chef/delivery
+async function requestNotificationPermission() {
+  try {
+    const permission = await Notification.requestPermission();
+    
+    if (permission === 'granted') {
+      console.log('Notification permission granted.');
+      
+      const token = await getToken(messaging, {
+        vapidKey: VAPID_KEY
+      });
+      
+      if (token) {
+        console.log('FCM Token:', token);
+        
+        // Save token based on role
+        if (state.user && state.role) {
+          const table = state.role === 'chef' ? 'chefs' : 'deliverers';
+          const idField = state.role === 'chef' ? 'chef_id' : 'deliverer_id';
+          
+          await supabase
+            .from(table)
+            .update({ fcm_token: token })
+            .eq(idField, state.user.id);
+        }
+        
+        return token;
+      }
+    }
+  } catch (err) {
+    console.error('An error occurred while retrieving token:', err);
+  }
+}
+
+// Handle foreground messages
+onMessage(messaging, (payload) => {
+  console.log('Message received:', payload);
+  
+  // Show notification
+  const notificationTitle = payload.notification.title;
+  const notificationOptions = {
+    body: payload.notification.body,
+    icon: '/icon.png'
+  };
+  
+  if (Notification.permission === 'granted') {
+    new Notification(notificationTitle, notificationOptions);
+  }
+  
+  // Show toast
+  showToast(payload.notification.body);
+  
+  // Refresh orders
+  loadOrders();
+});
+
+// Call after login
+window.addEventListener('partnerLoggedIn', () => {
+  requestNotificationPermission();
+});
+</script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://buzrzzawlmcblxjnjnjq.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ1enJ6emF3bG1jYmx4am5qbmpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NTc5NjAsImV4cCI6MjA4NTUzMzk2MH0.bVrL8AMioyyuEvbYVxmckS5qCIuQvnbnEqbOQr3Pkxc';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // State Management
+        const state = {
+            currentTab: 'orders',
+            user: null,
+            role: null,
+            orders: {
+                unanswered: [],
+                current: [],
+                completed: [],
+                preparing: []
+            },
+            selectedOrderForReject: null
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            setupEventListeners();
+        });
+
+        // Check Login
+        function checkLogin() {
+            const savedUser = localStorage.getItem('partnerUser');
+            if (savedUser) {
+                state.user = JSON.parse(savedUser);
+                state.role = state.user.role;
+                showMainApp();
+            }
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            document.getElementById('cancelReject').addEventListener('click', closeRejectModal);
+            document.getElementById('confirmReject').addEventListener('click', confirmReject);
+
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => switchTab(item.dataset.tab));
+            });
+        }
+
+        // Handle Login
+        async function handleLogin(e) {
+            e.preventDefault();
+
+            const role = document.getElementById('loginRole').value;
+            const phone = document.getElementById('loginPhone').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                let user;
+                if (role === 'chef') {
+                    const { data, error } = await supabase
+                        .from('chefs')
+                        .select('*')
+                        .eq('phone', phone)
+                        .eq('is_active', true)
+                        .single();
+
+                    if (error || !data) {
+                        showToast('Invalid credentials');
+                        return;
+                    }
+
+                    // In production, verify password hash
+                    // For now, simple check
+                    if (data.password_hash !== password) {
+                        showToast('Invalid credentials');
+                        return;
+                    }
+
+                    user = {
+                        id: data.chef_id,
+                        name: data.name,
+                        phone: data.phone,
+                        address: data.address,
+                        city_id: data.city_id,
+                        role: 'chef'
+                    };
+
+                } else if (role === 'delivery') {
+                    const { data, error } = await supabase
+                        .from('deliverers')
+                        .select('*')
+                        .eq('phone', phone)
+                        .single();
+
+                    if (error || !data) {
+                        showToast('Invalid credentials');
+                        return;
+                    }
+
+                    // Simple password check (in production, use proper auth)
+                    if (password !== '1234') { // Default password for demo
+                        showToast('Invalid credentials');
+                        return;
+                    }
+
+                    user = {
+                        id: data.deliverer_id,
+                        name: data.name,
+                        phone: data.phone,
+                        city_id: data.city_id,
+                        role: 'delivery'
+                    };
+                }
+
+                state.user = user;
+                state.role = user.role;
+                localStorage.setItem('partnerUser', JSON.stringify(user));
+                
+                showMainApp();
+                showToast('Login successful');
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showToast('Login failed');
+            }
+        }
+
+        // Handle Logout
+        function handleLogout() {
+            localStorage.removeItem('partnerUser');
+            state.user = null;
+            state.role = null;
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        // Show Main App
+        function showMainApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('userName').textContent = state.user.name;
+            
+            loadOrders();
+            // Set up real-time updates
+            setupRealtimeSubscription();
+        }
+
+        // Load Orders
+        async function loadOrders() {
+            try {
+                if (state.role === 'chef') {
+                    await loadChefOrders();
+                } else if (state.role === 'delivery') {
+                    await loadDeliveryOrders();
+                }
+                renderOrders();
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showToast('Failed to load orders');
+            }
+        }
+
+        // Load Chef Orders
+        async function loadChefOrders() {
+            // Unanswered orders
+            const { data: unanswered, error: error1 } = await supabase
+                .from('orders')
+                .select(`
+                    *,
+                    customers (*),
+                    order_items (*, menu (*))
+                `)
+                .eq('current_status', 'placed')
+                .in('order_id', 
+                    supabase
+                        .from('order_items')
+                        .select('order_id')
+                        .eq('chef_id', state.user.id)
+                );
+
+            if (!error1) {
+                state.orders.unanswered = unanswered || [];
+            }
+
+            // Current orders
+            const { data: current, error: error2 } = await supabase
+                .from('orders')
+                .select(`
+                    *,
+                    customers (*),
+                    order_items (*, menu (*))
+                `)
+                .in('current_status', ['accepted', 'prepared'])
+                .in('order_id', 
+                    supabase
+                        .from('order_items')
+                        .select('order_id')
+                        .eq('chef_id', state.user.id)
+                );
+
+            if (!error2) {
+                state.orders.current = current || [];
+            }
+
+            // Completed orders (last 5)
+            const { data: completed, error: error3 } = await supabase
+                .from('orders')
+                .select(`
+                    *,
+                    customers (*),
+                    order_items (*, menu (*))
+                `)
+                .in('current_status', ['delivered', 'cancelled'])
+                .in('order_id', 
+                    supabase
+                        .from('order_items')
+                        .select('order_id')
+                        .eq('chef_id', state.user.id)
+                )
+                .order('created_at', { ascending: false })
+                .limit(5);
+
+            if (!error3) {
+                state.orders.completed = completed || [];
+            }
+        }
+
+        // Load Delivery Orders
+        async function loadDeliveryOrders() {
+            // Unanswered orders (waiting for delivery acceptance)
+            const { data: unanswered, error: error1 } = await supabase
+                .from('orders')
+                .select(`
+                    *,
+                    customers (*),
+                    chefs (*),
+                    order_items (*, menu (*))
+                `)
+                .eq('current_status', 'accepted')
+                .eq('delivery_type', 'delivery')
+                .is('delivery_person_id', null)
+                .eq('city_id', state.user.city_id);
+
+            if (!error1) {
+                state.orders.unanswered = unanswered || [];
+            }
+
+            // Preparing orders
+            const { data: preparing, error: error2 } = await supabase
+                .from('orders')
+                .select(`
+                    *,
+                    customers (*),
+                    chefs (*),
+                    order_items (*, menu (*))
+                `)
+                .eq('current_status', 'accepted')
+                .eq('delivery_person_id', state.user.id);
+
+            if (!error2) {
+                state.orders.preparing = preparing || [];
+            }
+
+            // Current orders
+            const { data: current, error: error3 } = await supabase
+                .from('orders')
+                .select(`
+                    *,
+                    customers (*),
+                    chefs (*),
+                    order_items (*, menu (*))
+                `)
+                .in('current_status', ['prepared', 'picked_up'])
+                .eq('delivery_person_id', state.user.id);
+
+            if (!error3) {
+                state.orders.current = current || [];
+            }
+
+            // Completed orders
+            const { data: completed, error: error4 } = await supabase
+                .from('orders')
+                .select(`
+                    *,
+                    customers (*),
+                    chefs (*),
+                    order_items (*, menu (*))
+                `)
+                .eq('current_status', 'delivered')
+                .eq('delivery_person_id', state.user.id)
+                .order('created_at', { ascending: false })
+                .limit(5);
+
+            if (!error4) {
+                state.orders.completed = completed || [];
+            }
+        }
+
+        // Render Orders
+        function renderOrders() {
+            if (state.role === 'chef') {
+                renderChefOrders();
+            } else if (state.role === 'delivery') {
+                renderDeliveryOrders();
+            }
+        }
+
+        // Render Chef Orders
+        function renderChefOrders() {
+            const ordersSection = document.getElementById('ordersSection');
+            ordersSection.innerHTML = '';
+
+            // Unanswered Section
+            const unansweredDiv = document.createElement('div');
+            unansweredDiv.innerHTML = '<div class="section-header">Unanswered</div>';
+            
+            if (state.orders.unanswered.length === 0) {
+                unansweredDiv.innerHTML += '<div class="empty-state"><div class="empty-state-text">No new orders</div></div>';
+            } else {
+                state.orders.unanswered.forEach(order => {
+                    unansweredDiv.appendChild(createChefOrderCard(order, 'unanswered'));
+                });
+            }
+            ordersSection.appendChild(unansweredDiv);
+
+            // Current Section
+            const currentDiv = document.createElement('div');
+            currentDiv.innerHTML = '<div class="section-header" style="margin-top: 20px;">Current</div>';
+            
+            if (state.orders.current.length === 0) {
+                currentDiv.innerHTML += '<div class="empty-state"><div class="empty-state-text">No current orders</div></div>';
+            } else {
+                state.orders.current.forEach(order => {
+                    currentDiv.appendChild(createChefOrderCard(order, 'current'));
+                });
+            }
+            ordersSection.appendChild(currentDiv);
+
+            // Completed Section
+            const completedDiv = document.createElement('div');
+            completedDiv.innerHTML = '<div class="section-header" style="margin-top: 20px;">Completed (Last 5)</div>';
+            
+            if (state.orders.completed.length === 0) {
+                completedDiv.innerHTML += '<div class="empty-state"><div class="empty-state-text">No completed orders</div></div>';
+            } else {
+                state.orders.completed.forEach(order => {
+                    completedDiv.appendChild(createChefOrderCard(order, 'completed'));
+                });
+            }
+            ordersSection.appendChild(completedDiv);
+        }
+
+        // Create Chef Order Card
+        function createChefOrderCard(order, type) {
+            const card = document.createElement('div');
+            card.className = 'order-card';
+
+            const items = order.order_items || [];
+            const itemsList = items.map(item => 
+                `${item.menu?.item_name || 'Item'} × ${item.quantity}`
+            ).join(', ');
+
+            const totalAmount = items.reduce((sum, item) => sum + item.chef_amount, 0);
+
+            card.innerHTML = `
+                <div class="order-header">
+                    <div>
+                        <div class="order-id">Order #${order.order_id}</div>
+                        <div class="order-time">${formatTime(order.created_at)}</div>
+                    </div>
+                    <div class="order-amount">₹${totalAmount}</div>
+                </div>
+                <div class="order-items">
+                    ${items.map(item => `<div class="order-item">${item.menu?.item_name || 'Item'} × ${item.quantity}</div>`).join('')}
+                </div>
+                <div class="customer-info">
+                    <div class="customer-name">${order.customers?.name || 'Customer'}</div>
+                    <div>${order.customers?.address || ''}</div>
+                    <button class="btn-call" onclick="callCustomer('${order.customers?.phone}')">📞 Call Customer</button>
+                </div>
+            `;
+
+            // Add actions based on type
+            if (type === 'unanswered') {
+                const actions = document.createElement('div');
+                actions.className = 'order-actions';
+                
+                if (order.delivery_type === 'delivery') {
+                    actions.innerHTML = `
+                        <button class="btn-action danger" onclick="rejectOrder('${order.order_id}', '${order.customers?.phone}')">Reject & Call</button>
+                        <button class="btn-action" onclick="acceptOrder('${order.order_id}', false)">Accept</button>
+                        <button class="btn-action primary" onclick="acceptOrder('${order.order_id}', true)">Accept & Deliver</button>
+                    `;
+                } else {
+                    actions.innerHTML = `
+                        <button class="btn-action danger" onclick="rejectOrder('${order.order_id}', '${order.customers?.phone}')">Reject & Call</button>
+                        <button class="btn-action primary" onclick="acceptOrder('${order.order_id}', false)">Accept</button>
+                    `;
+                }
+                card.appendChild(actions);
+            } else if (type === 'current') {
+                const actions = document.createElement('div');
+                actions.className = 'order-actions';
+                actions.innerHTML = `
+                    <button class="btn-action primary" onclick="markDone('${order.order_id}')">Done</button>
+                `;
+                card.appendChild(actions);
+            }
+
+            return card;
+        }
+
+        // Render Delivery Orders
+        function renderDeliveryOrders() {
+            const ordersSection = document.getElementById('ordersSection');
+            ordersSection.innerHTML = '';
+
+            // Unanswered Section
+            const unansweredDiv = document.createElement('div');
+            unansweredDiv.innerHTML = '<div class="section-header">Available Orders</div>';
+            
+            if (state.orders.unanswered.length === 0) {
+                unansweredDiv.innerHTML += '<div class="empty-state"><div class="empty-state-text">No available orders</div></div>';
+            } else {
+                state.orders.unanswered.forEach(order => {
+                    unansweredDiv.appendChild(createDeliveryOrderCard(order, 'unanswered'));
+                });
+            }
+            ordersSection.appendChild(unansweredDiv);
+
+            // Preparing Section
+            const preparingDiv = document.createElement('div');
+            preparingDiv.innerHTML = '<div class="section-header" style="margin-top: 20px;">Preparing</div>';
+            
+            if (state.orders.preparing.length === 0) {
+                preparingDiv.innerHTML += '<div class="empty-state"><div class="empty-state-text">No orders preparing</div></div>';
+            } else {
+                state.orders.preparing.forEach(order => {
+                    preparingDiv.appendChild(createDeliveryOrderCard(order, 'preparing'));
+                });
+            }
+            ordersSection.appendChild(preparingDiv);
+
+            // Current Section
+            const currentDiv = document.createElement('div');
+            currentDiv.innerHTML = '<div class="section-header" style="margin-top: 20px;">Current Deliveries</div>';
+            
+            if (state.orders.current.length === 0) {
+                currentDiv.innerHTML += '<div class="empty-state"><div class="empty-state-text">No current deliveries</div></div>';
+            } else {
+                state.orders.current.forEach(order => {
+                    currentDiv.appendChild(createDeliveryOrderCard(order, 'current'));
+                });
+            }
+            ordersSection.appendChild(currentDiv);
+
+            // Completed Section
+            const completedDiv = document.createElement('div');
+            completedDiv.innerHTML = '<div class="section-header" style="margin-top: 20px;">Completed</div>';
+            
+            if (state.orders.completed.length === 0) {
+                completedDiv.innerHTML += '<div class="empty-state"><div class="empty-state-text">No completed deliveries</div></div>';
+            } else {
+                state.orders.completed.forEach(order => {
+                    completedDiv.appendChild(createDeliveryOrderCard(order, 'completed'));
+                });
+            }
+            ordersSection.appendChild(completedDiv);
+        }
+
+        // Create Delivery Order Card
+        function createDeliveryOrderCard(order, type) {
+            const card = document.createElement('div');
+            card.className = 'order-card';
+
+            const items = order.order_items || [];
+            const chefAmount = items.reduce((sum, item) => sum + item.chef_amount, 0);
+            const deliveryFee = order.delivery_amount || 0;
+            const totalToCollect = order.total_amount;
+
+            card.innerHTML = `
+                <div class="order-header">
+                    <div>
+                        <div class="order-id">Order #${order.order_id}</div>
+                        <div class="order-time">${formatTime(order.created_at)}</div>
+                    </div>
+                    <div class="order-amount">₹${totalToCollect}</div>
+                </div>
+                <div class="order-items">
+                    ${items.map(item => `<div class="order-item">${item.menu?.item_name || 'Item'} × ${item.quantity}</div>`).join('')}
+                </div>
+            `;
+
+            if (type === 'unanswered') {
+                const chefInfo = document.createElement('div');
+                chefInfo.className = 'address-info';
+                chefInfo.innerHTML = `
+                    <div class="address-label">Pick up from:</div>
+                    <div>${order.chefs?.name || 'Chef'}</div>
+                    <div>${order.chefs?.address || ''}</div>
+                    <button class="btn-call" onclick="callPhone('${order.chefs?.phone}')">📞 Call Chef</button>
+                `;
+                card.appendChild(chefInfo);
+
+                const actions = document.createElement('div');
+                actions.className = 'order-actions';
+                actions.innerHTML = `
+                    <button class="btn-action primary" onclick="acceptDelivery('${order.order_id}')">Accept Delivery</button>
+                `;
+                card.appendChild(actions);
+
+            } else if (type === 'preparing') {
+                const chefInfo = document.createElement('div');
+                chefInfo.className = 'address-info';
+                chefInfo.innerHTML = `
+                    <div class="address-label">Chef is preparing...</div>
+                    <div>${order.chefs?.name || 'Chef'}</div>
+                    <div>${order.chefs?.address || ''}</div>
+                    <button class="btn-call" onclick="callPhone('${order.chefs?.phone}')">📞 Call Chef</button>
+                `;
+                card.appendChild(chefInfo);
+
+            } else if (type === 'current') {
+                const status = order.current_status;
+                
+                if (status === 'prepared') {
+                    const chefInfo = document.createElement('div');
+                    chefInfo.className = 'address-info';
+                    chefInfo.innerHTML = `
+                        <div class="address-label">Pick up from:</div>
+                        <div>${order.chefs?.name || 'Chef'}</div>
+                        <div>${order.chefs?.address || ''}</div>
+                        <button class="btn-call" onclick="callPhone('${order.chefs?.phone}')">📞 Call Chef</button>
+                    `;
+                    card.appendChild(chefInfo);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'order-actions';
+                    actions.innerHTML = `
+                        <button class="btn-action primary" onclick="markPickedUp('${order.order_id}')">Picked Up</button>
+                    `;
+                    card.appendChild(actions);
+
+                } else if (status === 'picked_up') {
+                    const customerInfo = document.createElement('div');
+                    customerInfo.className = 'address-info';
+                    customerInfo.innerHTML = `
+                        <div class="address-label">Deliver to:</div>
+                        <div>${order.customers?.name || 'Customer'}</div>
+                        <div>${order.customers?.address || ''}</div>
+                        <button class="btn-call" onclick="callPhone('${order.customers?.phone}')">📞 Call Customer</button>
+                    `;
+                    card.appendChild(customerInfo);
+
+                    const amountInfo = document.createElement('div');
+                    amountInfo.className = 'customer-info';
+                    amountInfo.innerHTML = `
+                        <div><strong>Collect from customer:</strong> ₹${totalToCollect}</div>
+                        <div><strong>Pay to chef:</strong> ₹${chefAmount}</div>
+                        <div><strong>Your earnings:</strong> ₹${deliveryFee}</div>
+                    `;
+                    card.appendChild(amountInfo);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'order-actions';
+                    actions.innerHTML = `
+                        <button class="btn-action" onclick="markAmountReceived('${order.order_id}')">Amount Received</button>
+                        <button class="btn-action primary" onclick="markPaidToChef('${order.order_id}')">Paid to Chef</button>
+                    `;
+                    card.appendChild(actions);
+                }
+            }
+
+            return card;
+        }
+
+        // Accept Order (Chef)
+        async function acceptOrder(orderId, selfDeliver) {
+            try {
+                const updateData = {
+                    current_status: 'accepted'
+                };
+
+                if (selfDeliver) {
+                    updateData.delivery_person_id = state.user.id;
+                }
+
+                const { error } = await supabase
+                    .from('orders')
+                    .update(updateData)
+                    .eq('order_id', orderId);
+
+                if (error) throw error;
+
+                // Add to status history
+                await supabase
+                    .from('order_status_history')
+                    .insert({
+                        order_id: orderId,
+                        status: 'accepted',
+                        changed_by: 'chef'
+                    });
+
+                showToast('Order accepted');
+                loadOrders();
+
+            } catch (error) {
+                console.error('Error accepting order:', error);
+                showToast('Failed to accept order');
+            }
+        }
+
+        // Reject Order
+        function rejectOrder(orderId, customerPhone) {
+            state.selectedOrderForReject = { orderId, customerPhone };
+            document.getElementById('rejectModal').classList.add('active');
+        }
+
+        // Close Reject Modal
+        function closeRejectModal() {
+            document.getElementById('rejectModal').classList.remove('active');
+            state.selectedOrderForReject = null;
+        }
+
+        // Confirm Reject
+        async function confirmReject() {
+            const reason = document.getElementById('rejectReason').value;
+            const { orderId, customerPhone } = state.selectedOrderForReject;
+
+            try {
+                const { error } = await supabase
+                    .from('orders')
+                    .update({ current_status: 'cancelled' })
+                    .eq('order_id', orderId);
+
+                if (error) throw error;
+
+                // Add to status history
+                await supabase
+                    .from('order_status_history')
+                    .insert({
+                        order_id: orderId,
+                        status: 'cancelled',
+                        changed_by: 'chef'
+                    });
+
+                // Call customer
+                window.location.href = `tel:${customerPhone}`;
+
+                closeRejectModal();
+                showToast(`Order rejected: ${reason}`);
+                loadOrders();
+
+            } catch (error) {
+                console.error('Error rejecting order:', error);
+                showToast('Failed to reject order');
+            }
+        }
+
+        // Mark Done (Chef)
+        async function markDone(orderId) {
+            try {
+                const { error } = await supabase
+                    .from('orders')
+                    .update({ current_status: 'prepared' })
+                    .eq('order_id', orderId);
+
+                if (error) throw error;
+
+                await supabase
+                    .from('order_status_history')
+                    .insert({
+                        order_id: orderId,
+                        status: 'prepared',
+                        changed_by: 'chef'
+                    });
+
+                showToast('Order marked as done');
+                loadOrders();
+
+            } catch (error) {
+                console.error('Error marking done:', error);
+                showToast('Failed to update order');
+            }
+        }
+
+        // Accept Delivery
+        async function acceptDelivery(orderId) {
+            try {
+                const { error } = await supabase
+                    .from('orders')
+                    .update({ delivery_person_id: state.user.id })
+                    .eq('order_id', orderId);
+
+                if (error) throw error;
+
+                showToast('Delivery accepted');
+                loadOrders();
+
+            } catch (error) {
+                console.error('Error accepting delivery:', error);
+                showToast('Failed to accept delivery');
+            }
+        }
+
+        // Mark Picked Up
+        async function markPickedUp(orderId) {
+            try {
+                const { error } = await supabase
+                    .from('orders')
+                    .update({ current_status: 'picked_up' })
+                    .eq('order_id', orderId);
+
+                if (error) throw error;
+
+                await supabase
+                    .from('order_status_history')
+                    .insert({
+                        order_id: orderId,
+                        status: 'picked_up',
+                        changed_by: 'delivery'
+                    });
+
+                showToast('Order picked up');
+                loadOrders();
+
+            } catch (error) {
+                console.error('Error updating status:', error);
+                showToast('Failed to update status');
+            }
+        }
+
+        // Mark Amount Received
+        async function markAmountReceived(orderId) {
+            showToast('Amount received confirmed');
+        }
+
+        // Mark Paid to Chef
+        async function markPaidToChef(orderId) {
+            try {
+                const { error } = await supabase
+                    .from('orders')
+                    .update({ current_status: 'delivered' })
+                    .eq('order_id', orderId);
+
+                if (error) throw error;
+
+                await supabase
+                    .from('order_status_history')
+                    .insert({
+                        order_id: orderId,
+                        status: 'delivered',
+                        changed_by: 'delivery'
+                    });
+
+                showToast('Delivery completed');
+                loadOrders();
+
+            } catch (error) {
+                console.error('Error completing delivery:', error);
+                showToast('Failed to complete delivery');
+            }
+        }
+
+        // Call Functions
+        function callCustomer(phone) {
+            window.location.href = `tel:${phone}`;
+        }
+
+        function callPhone(phone) {
+            window.location.href = `tel:${phone}`;
+        }
+
+        // Render History
+        async function renderHistory() {
+            const historySection = document.getElementById('historySection');
+            historySection.innerHTML = '';
+
+            // User Details
+            const userDetails = document.createElement('div');
+            userDetails.className = 'user-details';
+            userDetails.innerHTML = `
+                <div class="detail-row"><span class="detail-label">Name:</span> ${state.user.name}</div>
+                <div class="detail-row"><span class="detail-label">Phone:</span> ${state.user.phone}</div>
+                <div class="detail-row"><span class="detail-label">Address:</span> ${state.user.address || 'N/A'}</div>
+            `;
+            historySection.appendChild(userDetails);
+
+            // Stats
+            try {
+                const stats = await calculateStats();
+                
+                const statsCard = document.createElement('div');
+                statsCard.className = 'stats-card';
+                statsCard.innerHTML = `
+                    <div class="stats-header">This Month</div>
+                    <div class="stat-row">
+                        <span class="stat-label">Total Revenue</span>
+                        <span class="stat-value">₹${stats.revenue}</span>
+                    </div>
+                    ${state.role === 'chef' ? `
+                    <div class="stat-row">
+                        <span class="stat-label">Service Fee</span>
+                        <span class="stat-value">₹${stats.serviceFee}</span>
+                    </div>
+                    ` : ''}
+                    <div class="stat-row">
+                        <span class="stat-label">Orders Accepted</span>
+                        <span class="stat-value">${stats.accepted}</span>
+                    </div>
+                    ${state.role === 'chef' ? `
+                    <div class="stat-row">
+                        <span class="stat-label">Orders Rejected</span>
+                        <span class="stat-value">${stats.rejected}</span>
+                    </div>
+                    ` : ''}
+                `;
+                historySection.appendChild(statsCard);
+
+                // Pay Button
+                const payBtn = document.createElement('button');
+                payBtn.className = 'btn-pay';
+                payBtn.textContent = `Pay ₹${stats.serviceFee || 0} via UPI`;
+                payBtn.disabled = (stats.serviceFee || 0) === 0;
+                payBtn.onclick = () => {
+                    showToast('UPI payment functionality coming soon');
+                };
+                historySection.appendChild(payBtn);
+
+            } catch (error) {
+                console.error('Error calculating stats:', error);
+            }
+        }
+
+        // Calculate Stats
+        async function calculateStats() {
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+
+            let stats = {
+                revenue: 0,
+                serviceFee: 0,
+                accepted: 0,
+                rejected: 0
+            };
+
+            try {
+                if (state.role === 'chef') {
+                    // Get all orders for this chef this month
+                    const { data, error } = await supabase
+                        .from('order_items')
+                        .select(`
+                            chef_amount,
+                            orders!inner (
+                                order_id,
+                                current_status,
+                                delivery_type,
+                                created_at
+                            )
+                        `)
+                        .eq('chef_id', state.user.id)
+                        .gte('orders.created_at', firstDay.toISOString());
+
+                    if (data) {
+                        data.forEach(item => {
+                            if (item.orders.current_status === 'delivered') {
+                                stats.revenue += item.chef_amount;
+                                // Service fee only for self-delivered orders
+                                if (item.orders.delivery_type === 'delivery') {
+                                    stats.serviceFee += 10;
+                                }
+                            }
+                            if (['accepted', 'prepared', 'picked_up', 'delivered'].includes(item.orders.current_status)) {
+                                stats.accepted++;
+                            } else if (item.orders.current_status === 'cancelled') {
+                                stats.rejected++;
+                            }
+                        });
+                    }
+
+                } else if (state.role === 'delivery') {
+                    const { data, error } = await supabase
+                        .from('orders')
+                        .select('*')
+                        .eq('delivery_person_id', state.user.id)
+                        .gte('created_at', firstDay.toISOString());
+
+                    if (data) {
+                        data.forEach(order => {
+                            if (order.current_status === 'delivered') {
+                                stats.revenue += order.delivery_amount;
+                                stats.accepted++;
+                            }
+                        });
+                        stats.serviceFee = stats.revenue * 0.1; // 10% platform fee
+                    }
+                }
+            } catch (error) {
+                console.error('Error calculating stats:', error);
+            }
+
+            return stats;
+        }
+
+        // Switch Tab
+        function switchTab(tab) {
+            state.currentTab = tab;
+
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.tab === tab);
+            });
+
+            // Hide/show sections
+            if (tab === 'orders') {
+                document.getElementById('ordersSection').classList.remove('hidden');
+                document.getElementById('historySection').classList.add('hidden');
+                loadOrders();
+            } else if (tab === 'history') {
+                document.getElementById('ordersSection').classList.add('hidden');
+                document.getElementById('historySection').classList.remove('hidden');
+                renderHistory();
+            }
+        }
+
+        // Setup Realtime Subscription
+        function setupRealtimeSubscription() {
+            // Subscribe to order changes
+            supabase
+                .channel('orders')
+                .on('postgres_changes', { 
+                    event: '*', 
+                    schema: 'public', 
+                    table: 'orders' 
+                }, payload => {
+                    console.log('Order change:', payload);
+                    loadOrders();
+                })
+                .subscribe();
+        }
+
+        // Format Time
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        // Show Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Make functions global
+        window.acceptOrder = acceptOrder;
+        window.rejectOrder = rejectOrder;
+        window.markDone = markDone;
+        window.acceptDelivery = acceptDelivery;
+        window.markPickedUp = markPickedUp;
+        window.markAmountReceived = markAmountReceived;
+        window.markPaidToChef = markPaidToChef;
+        window.callCustomer = callCustomer;
+        window.callPhone = callPhone;
+    </script>
+</body>
+</html>

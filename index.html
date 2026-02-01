@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pahad Food - Order Fresh Food</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            padding-bottom: 70px;
+        }
+
+        /* Header */
+        .header {
+            height: 20vh;
+            min-height: 120px;
+            max-height: 200px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('https://raw.githubusercontent.com/chinurxg/pahadfood/main/food/momo.jpg') center/cover;
+            opacity: 0.15;
+        }
+
+        .header-bg::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 60%;
+            background: linear-gradient(to right, #ffffff, transparent);
+        }
+
+        .header h1 {
+            position: relative;
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #1a1a1a;
+        }
+
+        /* Selection Section */
+        .selection-section {
+            padding: 20px 16px;
+            background: #f8f8f8;
+        }
+
+        .select-wrapper {
+            margin-bottom: 12px;
+        }
+
+        .select-wrapper label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            background: #ffffff;
+            color: #1a1a1a;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23666' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+        }
+
+        select:disabled {
+            background: #f5f5f5;
+            color: #999;
+        }
+
+        /* Menu Section */
+        .menu-section {
+            padding: 16px;
+        }
+
+        .menu-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: #ffffff;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+        }
+
+        .item-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .item-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .item-price {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .item-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-control {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            color: #1a1a1a;
+        }
+
+        .btn-control:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .quantity-display {
+            min-width: 24px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .item-image-wrapper {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            flex-shrink: 0;
+        }
+
+        .item-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .item-image::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 40%;
+            background: linear-gradient(to right, #ffffff, transparent);
+        }
+
+        .quantity-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #1a1a1a;
+            color: #ffffff;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Proceed Bar */
+        .proceed-bar {
+            position: fixed;
+            bottom: 60px;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
+            padding: 12px 16px;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .proceed-bar.visible {
+            display: flex;
+        }
+
+        .total-amount {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .btn-proceed {
+            padding: 10px 24px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn-proceed:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            height: 60px;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .nav-item.active {
+            color: #1a1a1a;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        /* Processing Tab */
+        .processing-section {
+            padding: 16px;
+        }
+
+        .order-card {
+            background: #ffffff;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .order-id {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .order-status {
+            font-size: 12px;
+            padding: 4px 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            color: #666;
+        }
+
+        .order-items-list {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .order-total {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        /* History Tab */
+        .history-section {
+            padding: 16px;
+        }
+
+        .customer-details {
+            background: #f8f8f8;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-row input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #ffffff;
+        }
+
+        .detail-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        /* Checkout Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            width: 100%;
+            max-height: 90vh;
+            border-radius: 16px 16px 0 0;
+            overflow-y: auto;
+            padding: 20px 16px;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+
+        .checkout-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .checkout-item-name {
+            color: #1a1a1a;
+        }
+
+        .checkout-divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 12px 0;
+        }
+
+        .checkout-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 14px 0;
+        }
+
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        .btn-cancel {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: #666;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: none;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-bg"></div>
+        <h1>PAHAD FOOD</h1>
+    </div>
+
+    <!-- City & Chef Selection -->
+    <div class="selection-section">
+        <div class="select-wrapper">
+            <label>Select City</label>
+            <select id="citySelect">
+                <option value="">Choose your city</option>
+            </select>
+        </div>
+        <div class="select-wrapper">
+            <label>Select Chef</label>
+            <select id="chefSelect" disabled>
+                <option value="">First select a city</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Menu Section -->
+    <div id="menuSection" class="menu-section hidden"></div>
+
+    <!-- Processing Section -->
+    <div id="processingSection" class="processing-section hidden"></div>
+
+    <!-- History Section -->
+    <div id="historySection" class="history-section hidden"></div>
+
+    <!-- Proceed Bar -->
+    <div class="proceed-bar" id="proceedBar">
+        <div class="total-amount" id="totalAmount">₹0</div>
+        <button class="btn-proceed" id="proceedBtn">Proceed</button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" data-tab="menu">
+            <div class="nav-icon">🍽</div>
+            <div>Menu</div>
+        </div>
+        <div class="nav-item" data-tab="processing">
+            <div class="nav-icon">⏳</div>
+            <div>Processing</div>
+        </div>
+        <div class="nav-item" data-tab="history">
+            <div class="nav-icon">📋</div>
+            <div>History</div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="modal" id="checkoutModal">
+        <div class="modal-content">
+            <div class="modal-header">Order Summary</div>
+            <div id="checkoutItems"></div>
+            <div class="checkout-divider"></div>
+            <div class="checkout-total">
+                <span>Total</span>
+                <span id="checkoutTotal">₹0</span>
+            </div>
+
+            <form id="checkoutForm">
+                <div class="form-group">
+                    <label>Special Instructions for Chef (Optional)</label>
+                    <textarea id="specialInstructions" placeholder="Any special requests..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="customerName" required placeholder="Enter your name">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="customerPhone" required placeholder="10-digit mobile number" pattern="[0-9]{10}">
+                </div>
+
+                <div class="form-group">
+                    <label>Delivery Address</label>
+                    <textarea id="customerAddress" required placeholder="Enter your full address"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Delivery Instructions (Optional)</label>
+                    <input type="text" id="deliveryInstructions" placeholder="Landmark, gate number, etc.">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="selfPickup">
+                    <label for="selfPickup">I'll pick up directly from chef (No delivery fee)</label>
+                </div>
+
+                <div class="checkout-divider"></div>
+                <div class="checkout-total">
+                    <span>Final Amount</span>
+                    <span id="finalAmount">₹0</span>
+                </div>
+                <div id="orderNumberDisplay" style="text-align: center; margin: 8px 0; font-size: 13px; color: #666;"></div>
+
+                <button type="submit" class="btn-submit">Place Order</button>
+                <button type="button" class="btn-cancel" id="cancelCheckout">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+// Import Firebase SDK
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js';
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAGYjiyPqt7sNAFND9I22AIs7wGh6gB7pQ",
+  authDomain: "pahadfood.firebaseapp.com",
+  projectId: "pahadfood",
+  storageBucket: "pahadfood.firebasestorage.app",
+  messagingSenderId: "93650163842",
+  appId: "1:93650163842:android:afe5f5016e4410fa6ebc9b"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+// Your VAPID key from Firebase Console > Cloud Messaging > Web Push certificates
+const VAPID_KEY = 'BJCgA4WI7ZNbRXF86toihrZbLABf0XURwSMNXxMQZXnxDJLSkk61cWQ2lJbOFzvrrkWeH-H-DZakZzMQ30adlws'; // Replace with your actual VAPID key
+
+// Request notification permission and get FCM token
+async function requestNotificationPermission() {
+  try {
+    const permission = await Notification.requestPermission();
+    
+    if (permission === 'granted') {
+      console.log('Notification permission granted.');
+      
+      // Get FCM token
+      const token = await getToken(messaging, {
+        vapidKey: VAPID_KEY
+      });
+      
+      if (token) {
+        console.log('FCM Token:', token);
+        
+        // Save token to Supabase for this customer
+        if (state.customerData.phone) {
+          await supabase
+            .from('customers')
+            .update({ fcm_token: token })
+            .eq('phone', state.customerData.phone);
+        }
+        
+        return token;
+      } else {
+        console.log('No registration token available.');
+      }
+    } else {
+      console.log('Notification permission denied.');
+    }
+  } catch (err) {
+    console.error('An error occurred while retrieving token:', err);
+  }
+}
+
+// Handle foreground messages
+onMessage(messaging, (payload) => {
+  console.log('Message received in foreground:', payload);
+  
+  // Show notification when app is in foreground
+  const notificationTitle = payload.notification.title;
+  const notificationOptions = {
+    body: payload.notification.body,
+    icon: '/icon.png'
+  };
+  
+  // Show browser notification
+  if (Notification.permission === 'granted') {
+    new Notification(notificationTitle, notificationOptions);
+  }
+  
+  // Also show toast in app
+  showToast(payload.notification.body);
+  
+  // Refresh orders if it's an order update
+  if (payload.data && payload.data.order_id) {
+    loadActiveOrders();
+  }
+});
+
+// Call this when customer logs in or page loads
+window.addEventListener('DOMContentLoaded', () => {
+  requestNotificationPermission();
+});
+</script>
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://buzrzzawlmcblxjnjnjq.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ1enJ6emF3bG1jYmx4am5qbmpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NTc5NjAsImV4cCI6MjA4NTUzMzk2MH0.bVrL8AMioyyuEvbYVxmckS5qCIuQvnbnEqbOQr3Pkxc';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // State Management
+        const state = {
+            currentTab: 'menu',
+            selectedCity: null,
+            selectedChef: null,
+            cart: {},
+            menuItems: [],
+            cities: [],
+            chefs: [],
+            customerData: JSON.parse(localStorage.getItem('customerData') || '{}'),
+            activeOrders: JSON.parse(localStorage.getItem('activeOrders') || '[]'),
+            orderHistory: JSON.parse(localStorage.getItem('orderHistory') || '[]')
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCities();
+            setupEventListeners();
+            loadCustomerData();
+            loadActiveOrders();
+            requestNotificationPermission();
+        });
+
+        // Request notification permission
+        function requestNotificationPermission() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            document.getElementById('citySelect').addEventListener('change', handleCityChange);
+            document.getElementById('chefSelect').addEventListener('change', handleChefChange);
+            document.getElementById('proceedBtn').addEventListener('click', handleProceedClick);
+            document.getElementById('cancelCheckout').addEventListener('click', closeCheckoutModal);
+            document.getElementById('checkoutForm').addEventListener('submit', handleCheckoutSubmit);
+            document.getElementById('selfPickup').addEventListener('change', updateFinalAmount);
+
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => switchTab(item.dataset.tab));
+            });
+        }
+
+        // Load Cities
+        async function loadCities() {
+            try {
+                const { data, error } = await supabase
+                    .from('cities')
+                    .select('*')
+                    .eq('is_active', true);
+
+                if (error) throw error;
+
+                state.cities = data || [];
+                const citySelect = document.getElementById('citySelect');
+                citySelect.innerHTML = '<option value="">Choose your city</option>';
+                
+                state.cities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.city_id;
+                    option.textContent = city.city_name;
+                    citySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading cities:', error);
+                showToast('Failed to load cities');
+            }
+        }
+
+        // Handle City Change
+        async function handleCityChange(e) {
+            const cityId = e.target.value;
+            state.selectedCity = cityId;
+            state.selectedChef = null;
+            state.cart = {};
+
+            const chefSelect = document.getElementById('chefSelect');
+            
+            if (!cityId) {
+                chefSelect.disabled = true;
+                chefSelect.innerHTML = '<option value="">First select a city</option>';
+                document.getElementById('menuSection').classList.add('hidden');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('chefs')
+                    .select('*')
+                    .eq('city_id', cityId)
+                    .eq('is_active', true);
+
+                if (error) throw error;
+
+                state.chefs = data || [];
+                chefSelect.disabled = false;
+                chefSelect.innerHTML = '<option value="">Choose a chef</option>';
+                
+                state.chefs.forEach(chef => {
+                    const option = document.createElement('option');
+                    option.value = chef.chef_id;
+                    option.textContent = chef.name;
+                    chefSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading chefs:', error);
+                showToast('Failed to load chefs');
+            }
+        }
+
+        // Handle Chef Change
+        async function handleChefChange(e) {
+            const chefId = e.target.value;
+            state.selectedChef = chefId;
+            state.cart = {};
+
+            if (!chefId) {
+                document.getElementById('menuSection').classList.add('hidden');
+                return;
+            }
+
+            await loadMenu(chefId);
+        }
+
+        // Load Menu
+        async function loadMenu(chefId) {
+            const menuSection = document.getElementById('menuSection');
+            menuSection.innerHTML = '<div class="loading">Loading menu...</div>';
+            menuSection.classList.remove('hidden');
+
+            try {
+                const { data, error } = await supabase
+                    .from('menu')
+                    .select('*')
+                    .eq('chef_id', chefId)
+                    .eq('is_available', true);
+
+                if (error) throw error;
+
+                state.menuItems = data || [];
+
+                if (state.menuItems.length === 0) {
+                    menuSection.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🍽</div><div class="empty-state-text">No items available</div></div>';
+                    return;
+                }
+
+                renderMenu();
+            } catch (error) {
+                console.error('Error loading menu:', error);
+                showToast('Failed to load menu');
+                menuSection.innerHTML = '<div class="empty-state"><div class="empty-state-text">Failed to load menu</div></div>';
+            }
+        }
+
+        // Render Menu
+        function renderMenu() {
+            const menuSection = document.getElementById('menuSection');
+            menuSection.innerHTML = '';
+
+            state.menuItems.forEach(item => {
+                const quantity = state.cart[item.item_id] || 0;
+                
+                const menuItem = document.createElement('div');
+                menuItem.className = 'menu-item';
+                menuItem.innerHTML = `
+                    <div class="item-details">
+                        <div class="item-name">${item.item_name}</div>
+                        <div class="item-price">₹${item.price}</div>
+                        <div class="item-controls">
+                            <button class="btn-control" onclick="updateQuantity('${item.item_id}', -1)" ${quantity === 0 ? 'disabled' : ''}>−</button>
+                            <span class="quantity-display">${quantity}</span>
+                            <button class="btn-control" onclick="updateQuantity('${item.item_id}', 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="item-image-wrapper">
+                        <img class="item-image" src="${item.image_url}" alt="${item.item_name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/%3E%3C/svg%3E'">
+                        ${quantity > 0 ? `<div class="quantity-badge">${quantity}</div>` : ''}
+                    </div>
+                `;
+                menuSection.appendChild(menuItem);
+            });
+
+            updateProceedBar();
+        }
+
+        // Update Quantity
+        function updateQuantity(itemId, change) {
+            const currentQty = state.cart[itemId] || 0;
+            const newQty = Math.max(0, currentQty + change);
+
+            if (newQty === 0) {
+                delete state.cart[itemId];
+            } else {
+                state.cart[itemId] = newQty;
+            }
+
+            renderMenu();
+        }
+
+        // Update Proceed Bar
+        function updateProceedBar() {
+            const total = calculateTotal();
+            const proceedBar = document.getElementById('proceedBar');
+            const totalAmount = document.getElementById('totalAmount');
+            const proceedBtn = document.getElementById('proceedBtn');
+
+            totalAmount.textContent = `₹${total}`;
+
+            if (total > 0) {
+                proceedBar.classList.add('visible');
+                proceedBtn.disabled = total < 100;
+            } else {
+                proceedBar.classList.remove('visible');
+            }
+        }
+
+        // Calculate Total
+        function calculateTotal() {
+            let total = 0;
+            for (const [itemId, quantity] of Object.entries(state.cart)) {
+                const item = state.menuItems.find(i => i.item_id === itemId);
+                if (item) {
+                    total += item.price * quantity;
+                }
+            }
+            return total;
+        }
+
+        // Handle Proceed Click
+        function handleProceedClick() {
+            const total = calculateTotal();
+            
+            if (total < 100) {
+                showToast('Add items worth at least ₹100 to continue');
+                return;
+            }
+
+            openCheckoutModal();
+        }
+
+        // Open Checkout Modal
+        function openCheckoutModal() {
+            const modal = document.getElementById('checkoutModal');
+            const checkoutItems = document.getElementById('checkoutItems');
+            const checkoutTotal = document.getElementById('checkoutTotal');
+
+            // Populate items
+            checkoutItems.innerHTML = '';
+            for (const [itemId, quantity] of Object.entries(state.cart)) {
+                const item = state.menuItems.find(i => i.item_id === itemId);
+                if (item) {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'checkout-item';
+                    itemDiv.innerHTML = `
+                        <span class="checkout-item-name">${item.item_name} × ${quantity}</span>
+                        <span>₹${item.price * quantity}</span>
+                    `;
+                    checkoutItems.appendChild(itemDiv);
+                }
+            }
+
+            const total = calculateTotal();
+            checkoutTotal.textContent = `₹${total}`;
+
+            // Pre-fill customer data if available
+            if (state.customerData.name) {
+                document.getElementById('customerName').value = state.customerData.name;
+            }
+            if (state.customerData.phone) {
+                document.getElementById('customerPhone').value = state.customerData.phone;
+            }
+            if (state.customerData.address) {
+                document.getElementById('customerAddress').value = state.customerData.address;
+            }
+
+            updateFinalAmount();
+            generateOrderNumber();
+
+            modal.classList.add('active');
+        }
+
+        // Close Checkout Modal
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.remove('active');
+        }
+
+        // Update Final Amount
+        function updateFinalAmount() {
+            const total = calculateTotal();
+            const selfPickup = document.getElementById('selfPickup').checked;
+            const deliveryFee = selfPickup ? 0 : 30;
+            const finalAmount = total + deliveryFee;
+
+            document.getElementById('finalAmount').textContent = `₹${finalAmount}`;
+        }
+
+        // Generate Order Number
+        function generateOrderNumber() {
+            const orderNumber = 'PF' + Date.now().toString().slice(-8);
+            document.getElementById('orderNumberDisplay').textContent = `Order #${orderNumber}`;
+            return orderNumber;
+        }
+
+        // Handle Checkout Submit
+        async function handleCheckoutSubmit(e) {
+            e.preventDefault();
+
+            const customerName = document.getElementById('customerName').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const customerAddress = document.getElementById('customerAddress').value;
+            const specialInstructions = document.getElementById('specialInstructions').value;
+            const deliveryInstructions = document.getElementById('deliveryInstructions').value;
+            const selfPickup = document.getElementById('selfPickup').checked;
+
+            // Save customer data
+            state.customerData = {
+                name: customerName,
+                phone: customerPhone,
+                address: customerAddress,
+                city_id: state.selectedCity
+            };
+            localStorage.setItem('customerData', JSON.stringify(state.customerData));
+
+            try {
+                // Create or get customer
+                let customerId = await getOrCreateCustomer();
+
+                // Create order
+                const total = calculateTotal();
+                const deliveryFee = selfPickup ? 0 : 30;
+                const platformFee = 10;
+                const finalTotal = total + deliveryFee + platformFee;
+
+                const orderData = {
+                    customer_id: customerId,
+                    city_id: state.selectedCity,
+                    delivery_type: selfPickup ? 'self_pickup' : 'delivery',
+                    current_status: 'placed',
+                    delivery_amount: deliveryFee,
+                    platform_fee: platformFee,
+                    total_amount: finalTotal,
+                    special_instructions: specialInstructions,
+                    delivery_instructions: deliveryInstructions
+                };
+
+                const { data: orderResult, error: orderError } = await supabase
+                    .from('orders')
+                    .insert(orderData)
+                    .select()
+                    .single();
+
+                if (orderError) throw orderError;
+
+                // Create order items
+                const orderItems = [];
+                for (const [itemId, quantity] of Object.entries(state.cart)) {
+                    const item = state.menuItems.find(i => i.item_id === itemId);
+                    if (item) {
+                        orderItems.push({
+                            order_id: orderResult.order_id,
+                            item_id: itemId,
+                            chef_id: state.selectedChef,
+                            quantity: quantity,
+                            price_at_order_time: item.price,
+                            chef_amount: item.price * quantity
+                        });
+                    }
+                }
+
+                const { error: itemsError } = await supabase
+                    .from('order_items')
+                    .insert(orderItems);
+
+                if (itemsError) throw itemsError;
+
+                // Add to active orders
+                state.activeOrders.push(orderResult);
+                localStorage.setItem('activeOrders', JSON.stringify(state.activeOrders));
+
+                // Reset cart
+                state.cart = {};
+                
+                closeCheckoutModal();
+                showToast('Order placed successfully!');
+                switchTab('processing');
+                renderMenu();
+
+            } catch (error) {
+                console.error('Error placing order:', error);
+                showToast('Failed to place order. Please try again.');
+            }
+        }
+
+        // Get or Create Customer
+        async function getOrCreateCustomer() {
+            const phone = state.customerData.phone;
+
+            // Check if customer exists
+            const { data: existing, error: fetchError } = await supabase
+                .from('customers')
+                .select('customer_id')
+                .eq('phone', phone)
+                .single();
+
+            if (existing) {
+                return existing.customer_id;
+            }
+
+            // Create new customer
+            const { data: newCustomer, error: createError } = await supabase
+                .from('customers')
+                .insert({
+                    name: state.customerData.name,
+                    phone: phone,
+                    address: state.customerData.address,
+                    city_id: state.customerData.city_id
+                })
+                .select()
+                .single();
+
+            if (createError) throw createError;
+
+            return newCustomer.customer_id;
+        }
+
+        // Load Customer Data
+        function loadCustomerData() {
+            const data = state.customerData;
+            if (data.name) {
+                // Customer data already loaded from state
+            }
+        }
+
+        // Load Active Orders
+        async function loadActiveOrders() {
+            // In production, fetch from database
+            // For now, use localStorage
+            renderProcessingTab();
+        }
+
+        // Render Processing Tab
+        function renderProcessingTab() {
+            const processingSection = document.getElementById('processingSection');
+            
+            if (state.activeOrders.length === 0) {
+                processingSection.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-text">No active orders</div></div>';
+                return;
+            }
+
+            processingSection.innerHTML = '';
+            state.activeOrders.forEach(order => {
+                const orderCard = document.createElement('div');
+                orderCard.className = 'order-card';
+                orderCard.innerHTML = `
+                    <div class="order-header">
+                        <div class="order-id">Order #${order.order_id}</div>
+                        <div class="order-status">${getStatusText(order.current_status)}</div>
+                    </div>
+                    <div class="order-items-list">View order details</div>
+                    <div class="order-total">₹${order.total_amount}</div>
+                `;
+                processingSection.appendChild(orderCard);
+            });
+        }
+
+        // Get Status Text
+        function getStatusText(status) {
+            const statusMap = {
+                'placed': 'Waiting for approval',
+                'accepted': 'Preparing',
+                'prepared': 'Ready',
+                'picked_up': 'On the way',
+                'delivered': 'Completed',
+                'cancelled': 'Cancelled'
+            };
+            return statusMap[status] || status;
+        }
+
+        // Render History Tab
+        function renderHistoryTab() {
+            const historySection = document.getElementById('historySection');
+            
+            historySection.innerHTML = `
+                <div class="customer-details">
+                    <div class="detail-label">Customer Details</div>
+                    <div class="detail-row">
+                        <input type="text" id="historyName" placeholder="Name" value="${state.customerData.name || ''}">
+                    </div>
+                    <div class="detail-row">
+                        <input type="tel" id="historyPhone" placeholder="Phone" value="${state.customerData.phone || ''}">
+                    </div>
+                    <div class="detail-row">
+                        <input type="text" id="historyAddress" placeholder="Address" value="${state.customerData.address || ''}">
+                    </div>
+                </div>
+                <div class="modal-header" style="margin-bottom: 12px;">This Month's Orders</div>
+            `;
+
+            if (state.orderHistory.length === 0) {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                emptyState.innerHTML = '<div class="empty-state-icon">📋</div><div class="empty-state-text">No order history</div>';
+                historySection.appendChild(emptyState);
+            } else {
+                state.orderHistory.forEach(order => {
+                    const orderCard = document.createElement('div');
+                    orderCard.className = 'order-card';
+                    orderCard.innerHTML = `
+                        <div class="order-header">
+                            <div class="order-id">Order #${order.order_id}</div>
+                            <div class="order-status">${getStatusText(order.current_status)}</div>
+                        </div>
+                        <div class="order-total">₹${order.total_amount}</div>
+                    `;
+                    historySection.appendChild(orderCard);
+                });
+            }
+
+            // Save customer details on change
+            ['historyName', 'historyPhone', 'historyAddress'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('change', () => {
+                        const field = id.replace('history', '').toLowerCase();
+                        state.customerData[field] = input.value;
+                        localStorage.setItem('customerData', JSON.stringify(state.customerData));
+                    });
+                }
+            });
+        }
+
+        // Switch Tab
+        function switchTab(tab) {
+            state.currentTab = tab;
+
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.tab === tab);
+            });
+
+            // Hide all sections
+            document.getElementById('menuSection').classList.add('hidden');
+            document.getElementById('processingSection').classList.add('hidden');
+            document.getElementById('historySection').classList.add('hidden');
+
+            // Show selected section
+            switch (tab) {
+                case 'menu':
+                    if (state.selectedChef) {
+                        document.getElementById('menuSection').classList.remove('hidden');
+                    }
+                    break;
+                case 'processing':
+                    document.getElementById('processingSection').classList.remove('hidden');
+                    renderProcessingTab();
+                    break;
+                case 'history':
+                    document.getElementById('historySection').classList.remove('hidden');
+                    renderHistoryTab();
+                    break;
+            }
+        }
+
+        // Show Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Make updateQuantity global
+        window.updateQuantity = updateQuantity;
+    </script>
+</body>
+</html>
