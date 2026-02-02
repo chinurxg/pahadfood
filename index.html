@@ -345,16 +345,18 @@ window.placeOrder = async () => {
     localStorage.setItem('customer', JSON.stringify(state.customer));
   }
   
-  const cartTotal = Object.entries(state.cart).reduce((sum, [id, qty]) => {
+  // Calculate food total
+  const foodTotal = Object.entries(state.cart).reduce((sum, [id, qty]) => {
     const item = state.menu.find(m => m.item_id == id);
     return sum + (item?.price || 0) * qty;
   }, 0);
   
-  // Calculate charges - only for delivery
+  // Calculate charges - FIXED VERSION
   const deliveryAmount = deliveryType === 'delivery' ? 50 : 0;
-  const platformFee = deliveryType === 'delivery' ? 10 : 0; // Service fee included in delivery
-  const totalAmount = cartTotal + deliveryAmount;
+  const platformFee = deliveryType === 'delivery' ? 10 : 0; // Platform gets ₹10 from ₹50 delivery fee
+  const totalAmount = foodTotal + deliveryAmount;
   
+  // Create order
   const { data: order } = await supabase.from('orders').insert({
     customer_id: customerId,
     city_id: city,
@@ -365,10 +367,13 @@ window.placeOrder = async () => {
     total_amount: totalAmount
   }).select().single();
   
-  // Insert order items
+  // Insert order items - FIXED: Chef gets 100% of food amount
   for (const [itemId, qty] of Object.entries(state.cart)) {
     const item = state.menu.find(m => m.item_id == itemId);
-    const chefAmount = item.price * qty - (deliveryType === 'delivery' ? (platformFee * (item.price * qty) / totalAmount) : 0);
+    const itemTotal = item.price * qty;
+    
+    // CRITICAL FIX: Chef gets 100% of food price, no deductions!
+    const chefAmount = itemTotal;
     
     await supabase.from('order_items').insert({
       order_id: order.order_id,
@@ -376,7 +381,7 @@ window.placeOrder = async () => {
       chef_id: item.chef_id,
       quantity: qty,
       price_at_order_time: item.price,
-      chef_amount: chefAmount
+      chef_amount: chefAmount // Chef gets full food amount
     });
   }
   
@@ -711,5 +716,4 @@ render();
 </script>
 
 </body>
-
 </html>
