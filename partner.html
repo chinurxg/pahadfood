@@ -6,34 +6,133 @@
 <title>Pahad Food Partner</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root { --primary: #1a1a1a; --secondary: #666; --border: #e0e0e0; --bg: #fff; }
+:root { --primary: #1a1a1a; --secondary: #666; --border: #e0e0e0; --bg: #fff; --success: #2e7d32; --danger: #d32f2f; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--primary); }
-.top-bar { background: var(--primary); color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+body { font-family: 'Inter', sans-serif; background: #fafafa; color: var(--primary); }
+.top-bar { 
+  background: var(--primary); color: white; padding: 16px; 
+  display: flex; justify-content: space-between; align-items: center; 
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 .top-bar h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; }
+.top-bar .user-info { font-size: 14px; opacity: 0.9; }
 .container { padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 80px; }
-input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border); border-radius: 4px; font-size: 15px; font-family: inherit; }
-button { padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin: 4px; }
+input, select, textarea { 
+  width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border); 
+  border-radius: 6px; font-size: 15px; font-family: inherit; background: white;
+}
+button { 
+  padding: 12px 24px; background: var(--primary); color: white; border: none; 
+  border-radius: 6px; font-weight: 600; cursor: pointer; margin: 4px; 
+  transition: opacity 0.2s;
+}
+button:hover { opacity: 0.9; }
 button.secondary { background: white; color: var(--primary); border: 1px solid var(--border); }
-button.danger { background: #d32f2f; }
-.order-card { border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin: 12px 0; }
-.order-card h4 { font-size: 16px; margin-bottom: 8px; }
+button.danger { background: var(--danger); }
+button.success { background: var(--success); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+.order-card { 
+  border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin: 12px 0; 
+  background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.order-card h4 { font-size: 16px; margin-bottom: 8px; font-weight: 600; }
 .order-card .meta { font-size: 13px; color: var(--secondary); margin: 4px 0; }
-.order-card .items { margin: 8px 0; font-size: 14px; }
+.order-card .items { margin: 8px 0; font-size: 14px; line-height: 1.6; }
+.order-card .items div { padding: 2px 0; }
+.order-card .amount { font-weight: 600; font-size: 16px; margin: 8px 0; color: var(--primary); }
 .order-card .actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+.order-card .actions button { margin: 0; flex: 1; min-width: 120px; }
 .section { margin: 24px 0; }
-.section h3 { font-size: 18px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
-.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg); border-top: 1px solid var(--border); display: flex; z-index: 101; }
-.bottom-nav div { flex: 1; padding: 12px; text-align: center; cursor: pointer; font-size: 14px; font-weight: 500; }
+.section h3 { 
+  font-size: 18px; margin-bottom: 12px; padding-bottom: 8px; 
+  border-bottom: 2px solid var(--primary); font-weight: 600;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.section h3 .badge-count {
+  background: var(--primary);
+  color: white;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.bottom-nav { 
+  position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg); 
+  border-top: 1px solid var(--border); display: flex; z-index: 101; 
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+}
+.bottom-nav div { 
+  flex: 1; padding: 12px; text-align: center; cursor: pointer; 
+  font-size: 14px; font-weight: 500; 
+}
 .bottom-nav div.active { color: var(--primary); border-top: 2px solid var(--primary); }
 .bottom-nav div:not(.active) { color: var(--secondary); }
-.login-form { max-width: 400px; margin: 100px auto; padding: 24px; border: 1px solid var(--border); border-radius: 8px; }
-.login-form h2 { margin-bottom: 16px; }
+.login-form { 
+  max-width: 400px; margin: 100px auto; padding: 32px; 
+  border: 1px solid var(--border); border-radius: 12px; 
+  background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.login-form h2 { margin-bottom: 24px; text-align: center; }
 .hidden { display: none !important; }
 label { display: block; font-size: 14px; margin: 12px 0 4px; font-weight: 500; }
-.stat-box { background: #f9f9f9; padding: 12px; border-radius: 6px; margin: 8px 0; }
+.stat-box { 
+  background: white; padding: 16px; border-radius: 8px; margin: 10px 0; 
+  border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
 .stat-box .label { font-size: 13px; color: var(--secondary); }
-.stat-box .value { font-size: 20px; font-weight: 600; margin-top: 4px; }
+.stat-box .value { font-size: 24px; font-weight: 700; margin-top: 4px; color: var(--primary); }
+
+/* Shimmer loading */
+.shimmer-wrapper { padding: 16px; }
+.shimmer { 
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+  margin: 12px 0;
+  height: 120px;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--secondary);
+}
+.empty-state svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.status-new { background: #ff9800; }
+.status-accepted { background: #2196f3; }
+.status-preparing { background: #9c27b0; }
+.status-ready { background: var(--success); }
+
+.call-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #4caf50;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-left: 8px;
+}
 </style>
 </head>
 <body>
@@ -41,7 +140,7 @@ label { display: block; font-size: 14px; margin: 12px 0 4px; font-weight: 500; }
 <div id="loginScreen">
   <div class="login-form">
     <h2>Partner Login</h2>
-    <input type="text" id="username" placeholder="Username">
+    <input type="text" id="username" placeholder="Phone Number">
     <input type="password" id="password" placeholder="Password">
     <button onclick="login()" style="width: 100%; margin-top: 8px;">Login</button>
   </div>
@@ -50,7 +149,10 @@ label { display: block; font-size: 14px; margin: 12px 0 4px; font-weight: 500; }
 <div id="mainApp" class="hidden">
   <div class="top-bar">
     <h2>Pahad Food</h2>
-    <span id="userName"></span>
+    <div class="user-info">
+      <div id="userName"></div>
+      <div id="userRole" style="font-size: 12px; opacity: 0.8;"></div>
+    </div>
   </div>
   
   <div id="appContent"></div>
@@ -85,7 +187,9 @@ window.state = {
   tab: 'orders', 
   user: JSON.parse(localStorage.getItem('partner') || 'null'),
   orders: [],
-  stats: {}
+  stats: {},
+  loading: false,
+  ordersInterval: null
 };
 
 async function initFCM() {
@@ -105,22 +209,40 @@ onMessage(messaging, (payload) => {
 });
 
 window.login = async () => {
-  const username = document.getElementById('username').value;
+  const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
+  
+  if (!username || !password) {
+    alert('Please enter phone and password');
+    return;
+  }
   
   // Try chef login
   const { data: chef } = await supabase.from('chefs').select('*').eq('phone', username).single();
   if (chef && chef.password_hash === password) {
-    state.user = { id: chef.chef_id, role: 'chef', name: chef.name, phone: chef.phone, address: chef.address, city_id: chef.city_id };
+    state.user = { 
+      id: chef.chef_id, 
+      role: 'chef', 
+      name: chef.name, 
+      phone: chef.phone, 
+      address: chef.address, 
+      city_id: chef.city_id 
+    };
     localStorage.setItem('partner', JSON.stringify(state.user));
     showApp();
     return;
   }
   
-  // Try delivery login
+  // Try delivery login - using phone as password for now
   const { data: delivery } = await supabase.from('deliverers').select('*').eq('phone', username).single();
   if (delivery && delivery.phone === password) {
-    state.user = { id: delivery.deliverer_id, role: 'delivery', name: delivery.name, phone: delivery.phone, city_id: delivery.city_id };
+    state.user = { 
+      id: delivery.deliverer_id, 
+      role: 'delivery', 
+      name: delivery.name, 
+      phone: delivery.phone, 
+      city_id: delivery.city_id 
+    };
     localStorage.setItem('partner', JSON.stringify(state.user));
     showApp();
     return;
@@ -133,44 +255,107 @@ function showApp() {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('mainApp').classList.remove('hidden');
   document.getElementById('userName').textContent = state.user.name;
+  document.getElementById('userRole').textContent = state.user.role === 'chef' ? 'Chef' : 'Delivery Partner';
   initFCM();
   loadOrders();
 }
 
 window.switchTab = (tab) => {
+  // Clear any existing interval
+  if (state.ordersInterval) {
+    clearInterval(state.ordersInterval);
+    state.ordersInterval = null;
+  }
+  
   state.tab = tab;
   document.querySelectorAll('.bottom-nav div').forEach((el, i) => {
     el.classList.toggle('active', ['orders', 'history'][i] === tab);
   });
-  if (tab === 'orders') loadOrders();
-  if (tab === 'history') loadStats();
+  
+  if (tab === 'orders') {
+    loadOrders();
+    // Auto-refresh every 5 seconds
+    state.ordersInterval = setInterval(loadOrders, 5000);
+  }
+  if (tab === 'history') {
+    loadStats();
+  }
+  
   render();
 };
 
 async function loadOrders() {
-  if (state.user.role === 'chef') {
-    const { data: items } = await supabase.from('order_items')
-      .select('*, orders(*, customers(*)), menu(*)')
-      .eq('chef_id', state.user.id)
-      .in('orders.current_status', ['placed', 'accepted', 'prepared']);
-    
-    const ordersMap = {};
-    items?.forEach(item => {
-      const orderId = item.orders.order_id;
-      if (!ordersMap[orderId]) ordersMap[orderId] = { ...item.orders, items: [] };
-      ordersMap[orderId].items.push(item);
-    });
-    
-    state.orders = Object.values(ordersMap);
-  } else {
-    const { data } = await supabase.from('orders')
-      .select('*, order_items(*, menu(*)), customers(*)')
-      .eq('city_id', state.user.city_id)
-      .eq('delivery_type', 'delivery')
-      .in('current_status', ['accepted', 'prepared', 'picked_up']);
-    
-    state.orders = data || [];
+  state.loading = true;
+  render();
+  
+  try {
+    if (state.user.role === 'chef') {
+      // Get all order_items for this chef with order details
+      const { data: items, error } = await supabase
+        .from('order_items')
+        .select(`
+          *,
+          orders!inner (
+            *,
+            customers (*)
+          ),
+          menu (*)
+        `)
+        .eq('chef_id', state.user.id)
+        .in('orders.current_status', ['placed', 'accepted', 'prepared']);
+      
+      if (error) {
+        console.error('Error loading chef orders:', error);
+        state.orders = [];
+      } else {
+        // Group items by order_id
+        const ordersMap = {};
+        (items || []).forEach(item => {
+          const orderId = item.orders.order_id;
+          if (!ordersMap[orderId]) {
+            ordersMap[orderId] = { 
+              ...item.orders, 
+              items: [],
+              customer: item.orders.customers
+            };
+          }
+          ordersMap[orderId].items.push({
+            ...item,
+            menu: item.menu
+          });
+        });
+        
+        state.orders = Object.values(ordersMap);
+      }
+    } else {
+      // Delivery partner orders
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          order_items (
+            *,
+            menu (*)
+          ),
+          customers (*)
+        `)
+        .eq('city_id', state.user.city_id)
+        .eq('delivery_type', 'delivery')
+        .in('current_status', ['accepted', 'prepared', 'picked_up']);
+      
+      if (error) {
+        console.error('Error loading delivery orders:', error);
+        state.orders = [];
+      } else {
+        state.orders = data || [];
+      }
+    }
+  } catch (err) {
+    console.error('Exception loading orders:', err);
+    state.orders = [];
   }
+  
+  state.loading = false;
   render();
 }
 
@@ -180,17 +365,19 @@ async function loadStats() {
   
   if (state.user.role === 'chef') {
     const { data: items } = await supabase.from('order_items')
-      .select('*, orders(*)')
+      .select('*, orders!inner(*)')
       .eq('chef_id', state.user.id)
       .gte('orders.created_at', startOfMonth);
     
-    const accepted = items?.filter(i => i.orders.current_status !== 'cancelled') || [];
-    const revenue = accepted.reduce((s, i) => s + i.chef_amount, 0);
-    const serviceFee = accepted.filter(i => i.orders.delivery_type === 'self_pickup').reduce((s, i) => s + i.chef_amount * 0.05, 0);
+    const accepted = (items || []).filter(i => i.orders.current_status !== 'cancelled');
+    const revenue = accepted.reduce((s, i) => s + parseFloat(i.chef_amount || 0), 0);
+    const serviceFee = accepted
+      .filter(i => i.orders.delivery_type === 'delivery')
+      .reduce((s, i) => s + parseFloat(i.orders.platform_fee || 0), 0);
     
     state.stats = {
-      revenue,
-      serviceFee,
+      revenue: revenue.toFixed(2),
+      serviceFee: serviceFee.toFixed(2),
       accepted: accepted.length,
       rejected: (items?.length || 0) - accepted.length
     };
@@ -201,13 +388,13 @@ async function loadStats() {
       .gte('created_at', startOfMonth);
     
     const completed = orders?.filter(o => o.current_status === 'delivered') || [];
-    const revenue = completed.reduce((s, o) => s + o.delivery_amount, 0);
-    const serviceFee = revenue * 0.3;
+    const revenue = completed.reduce((s, o) => s + parseFloat(o.delivery_amount || 0), 0);
+    const serviceFee = revenue * 0.2; // 20% service fee for delivery
     
     state.stats = {
-      revenue,
-      serviceFee,
-      profit: revenue - serviceFee,
+      revenue: revenue.toFixed(2),
+      serviceFee: serviceFee.toFixed(2),
+      profit: (revenue - serviceFee).toFixed(2),
       completed: completed.length
     };
   }
@@ -215,23 +402,52 @@ async function loadStats() {
 }
 
 window.acceptOrder = async (orderId, withDelivery = false) => {
-  await supabase.from('orders').update({ current_status: 'accepted' }).eq('order_id', orderId);
-  await supabase.from('order_status_history').insert({ order_id: orderId, status: 'accepted', changed_by: 'chef' });
+  const updates = { current_status: 'accepted' };
+  if (withDelivery) {
+    updates.delivery_person_id = state.user.id;
+  }
+  
+  await supabase.from('orders').update(updates).eq('order_id', orderId);
+  await supabase.from('order_status_history').insert({ 
+    order_id: orderId, 
+    status: 'accepted', 
+    changed_by: 'chef' 
+  });
   loadOrders();
 };
 
 window.rejectOrder = async (orderId) => {
   const reason = prompt('Reason for rejection:');
   if (!reason) return;
+  
   await supabase.from('orders').update({ current_status: 'cancelled' }).eq('order_id', orderId);
-  await supabase.from('order_status_history').insert({ order_id: orderId, status: 'cancelled', changed_by: 'chef' });
-  // TODO: Call customer
+  await supabase.from('order_status_history').insert({ 
+    order_id: orderId, 
+    status: 'cancelled', 
+    changed_by: 'chef' 
+  });
+  
+  // Get customer phone for calling
+  const { data: order } = await supabase
+    .from('orders')
+    .select('customers(*)')
+    .eq('order_id', orderId)
+    .single();
+  
+  if (order?.customers?.phone) {
+    window.location.href = `tel:${order.customers.phone}`;
+  }
+  
   loadOrders();
 };
 
 window.markDone = async (orderId) => {
   await supabase.from('orders').update({ current_status: 'prepared' }).eq('order_id', orderId);
-  await supabase.from('order_status_history').insert({ order_id: orderId, status: 'prepared', changed_by: 'chef' });
+  await supabase.from('order_status_history').insert({ 
+    order_id: orderId, 
+    status: 'prepared', 
+    changed_by: 'chef' 
+  });
   loadOrders();
 };
 
@@ -242,13 +458,21 @@ window.acceptDelivery = async (orderId) => {
 
 window.markPickedUp = async (orderId) => {
   await supabase.from('orders').update({ current_status: 'picked_up' }).eq('order_id', orderId);
-  await supabase.from('order_status_history').insert({ order_id: orderId, status: 'picked_up', changed_by: 'delivery' });
+  await supabase.from('order_status_history').insert({ 
+    order_id: orderId, 
+    status: 'picked_up', 
+    changed_by: 'delivery' 
+  });
   loadOrders();
 };
 
 window.markDelivered = async (orderId) => {
   await supabase.from('orders').update({ current_status: 'delivered' }).eq('order_id', orderId);
-  await supabase.from('order_status_history').insert({ order_id: orderId, status: 'delivered', changed_by: 'delivery' });
+  await supabase.from('order_status_history').insert({ 
+    order_id: orderId, 
+    status: 'delivered', 
+    changed_by: 'delivery' 
+  });
   loadOrders();
 };
 
@@ -258,68 +482,165 @@ function render() {
   if (state.tab === 'orders') {
     let html = '<div class="container">';
     
-    if (state.user.role === 'chef') {
+    if (state.loading) {
+      html += '<div class="shimmer"></div><div class="shimmer"></div><div class="shimmer"></div>';
+    } else if (state.user.role === 'chef') {
       const unanswered = state.orders.filter(o => o.current_status === 'placed');
       const current = state.orders.filter(o => o.current_status === 'accepted');
+      const prepared = state.orders.filter(o => o.current_status === 'prepared');
       
-      html += '<div class="section"><h3>Unanswered</h3>';
-      unanswered.forEach(order => {
-        html += `<div class="order-card">
-          <h4>Order #${order.order_id}</h4>
-          <div class="meta">${order.customers.name} • ${order.customers.address}</div>
-          <div class="items">${order.items.map(i => `${i.menu.item_name} x${i.quantity}`).join(', ')}</div>
-          <div style="font-weight: 600; margin-top: 8px;">₹${order.total_amount}</div>
-          <div class="actions">
-            <button class="danger" onclick="rejectOrder(${order.order_id})">Reject & Call</button>
-            <button onclick="acceptOrder(${order.order_id})">Accept</button>
-            ${order.delivery_type === 'delivery' ? `<button onclick="acceptOrder(${order.order_id}, true)">Accept & Deliver</button>` : ''}
-          </div>
-        </div>`;
-      });
+      html += `<div class="section">
+        <h3>
+          <span><span class="status-indicator status-new"></span>New Orders</span>
+          ${unanswered.length > 0 ? `<span class="badge-count">${unanswered.length}</span>` : ''}
+        </h3>`;
+      
+      if (unanswered.length === 0) {
+        html += '<div class="empty-state" style="padding: 20px;"><p>No new orders</p></div>';
+      } else {
+        unanswered.forEach(order => {
+          html += `<div class="order-card">
+            <h4>Order #${order.order_id}</h4>
+            <div class="meta">
+              ${order.customer?.name || 'Customer'} • ${order.customer?.address || 'No address'}
+              <a href="tel:${order.customer?.phone || ''}" class="call-btn">📞 Call</a>
+            </div>
+            <div class="items">
+              ${order.items.map(i => `<div>• ${i.menu?.item_name || 'Item'} x${i.quantity}</div>`).join('')}
+            </div>
+            <div class="amount">Total: ₹${order.total_amount}</div>
+            <div class="meta">Delivery: ${order.delivery_type === 'delivery' ? 'Home Delivery' : 'Self Pickup'}</div>
+            <div class="actions">
+              <button class="danger" onclick="rejectOrder(${order.order_id})">Reject & Call</button>
+              <button class="success" onclick="acceptOrder(${order.order_id})">Accept</button>
+              ${order.delivery_type === 'delivery' ? `<button class="success" onclick="acceptOrder(${order.order_id}, true)">Accept & Deliver</button>` : ''}
+            </div>
+          </div>`;
+        });
+      }
       html += '</div>';
       
-      html += '<div class="section"><h3>Current</h3>';
-      current.forEach(order => {
-        html += `<div class="order-card">
-          <h4>Order #${order.order_id}</h4>
-          <div class="items">${order.items.map(i => `${i.menu.item_name} x${i.quantity}`).join(', ')}</div>
-          <div class="actions">
-            <button onclick="markDone(${order.order_id})">Done</button>
-          </div>
-        </div>`;
-      });
+      html += `<div class="section">
+        <h3>
+          <span><span class="status-indicator status-preparing"></span>Preparing</span>
+          ${current.length > 0 ? `<span class="badge-count">${current.length}</span>` : ''}
+        </h3>`;
+      
+      if (current.length === 0) {
+        html += '<div class="empty-state" style="padding: 20px;"><p>No orders being prepared</p></div>';
+      } else {
+        current.forEach(order => {
+          html += `<div class="order-card">
+            <h4>Order #${order.order_id}</h4>
+            <div class="items">
+              ${order.items.map(i => `<div>• ${i.menu?.item_name || 'Item'} x${i.quantity}</div>`).join('')}
+            </div>
+            <div class="amount">₹${order.total_amount}</div>
+            <div class="actions">
+              <button class="success" onclick="markDone(${order.order_id})">Mark as Ready</button>
+            </div>
+          </div>`;
+        });
+      }
       html += '</div>';
+      
+      if (prepared.length > 0) {
+        html += `<div class="section">
+          <h3>
+            <span><span class="status-indicator status-ready"></span>Ready for Pickup</span>
+            <span class="badge-count">${prepared.length}</span>
+          </h3>`;
+        
+        prepared.forEach(order => {
+          html += `<div class="order-card">
+            <h4>Order #${order.order_id}</h4>
+            <div class="meta">${order.delivery_type === 'delivery' ? 'Waiting for delivery partner' : 'Customer pickup'}</div>
+            <div class="items">
+              ${order.items.map(i => `<div>• ${i.menu?.item_name || 'Item'} x${i.quantity}</div>`).join('')}
+            </div>
+            <div class="amount">₹${order.total_amount}</div>
+          </div>`;
+        });
+        html += '</div>';
+      }
+      
     } else {
-      const unanswered = state.orders.filter(o => o.current_status === 'accepted' && !o.delivery_person_id);
+      // Delivery partner view
+      const unanswered = state.orders.filter(o => o.current_status === 'prepared' && !o.delivery_person_id);
       const preparing = state.orders.filter(o => o.current_status === 'accepted' && o.delivery_person_id === state.user.id);
       const current = state.orders.filter(o => ['prepared', 'picked_up'].includes(o.current_status) && o.delivery_person_id === state.user.id);
       
-      html += '<div class="section"><h3>Unanswered</h3>';
-      unanswered.forEach(order => {
-        html += `<div class="order-card">
-          <h4>Order #${order.order_id}</h4>
-          <div class="meta">Pickup: ${order.order_items[0]?.menu?.item_name ? 'Chef location' : 'N/A'}</div>
-          <div style="font-weight: 600;">₹${order.delivery_amount}</div>
-          <div class="actions">
-            <button onclick="acceptDelivery(${order.order_id})">Accept</button>
-          </div>
-        </div>`;
-      });
+      html += `<div class="section">
+        <h3>
+          <span><span class="status-indicator status-new"></span>Available Deliveries</span>
+          ${unanswered.length > 0 ? `<span class="badge-count">${unanswered.length}</span>` : ''}
+        </h3>`;
+      
+      if (unanswered.length === 0) {
+        html += '<div class="empty-state" style="padding: 20px;"><p>No available deliveries</p></div>';
+      } else {
+        unanswered.forEach(order => {
+          const chefAddress = 'Chef location'; // Would need to fetch chef address
+          html += `<div class="order-card">
+            <h4>Order #${order.order_id}</h4>
+            <div class="meta">Pickup from: ${chefAddress}</div>
+            <div class="amount">Delivery Fee: ₹${order.delivery_amount}</div>
+            <div class="meta">Service Fee: ₹${order.platform_fee} (included)</div>
+            <div class="actions">
+              <button class="success" onclick="acceptDelivery(${order.order_id})">Accept Delivery</button>
+            </div>
+          </div>`;
+        });
+      }
       html += '</div>';
       
-      html += '<div class="section"><h3>Current</h3>';
-      current.forEach(order => {
-        const isPicked = order.current_status === 'picked_up';
-        html += `<div class="order-card">
-          <h4>Order #${order.order_id}</h4>
-          <div class="meta">${isPicked ? 'Deliver to' : 'Pickup from'}: ${isPicked ? order.customers.address : 'Chef'}</div>
-          <div style="font-weight: 600;">Collect: ₹${order.total_amount} | Pay Chef: ₹${order.total_amount - order.delivery_amount - order.platform_fee}</div>
-          <div class="actions">
-            ${!isPicked ? `<button onclick="markPickedUp(${order.order_id})">Picked Up</button>` : ''}
-            ${isPicked ? `<button onclick="markDelivered(${order.order_id})">Delivered</button>` : ''}
-          </div>
-        </div>`;
-      });
+      if (preparing.length > 0) {
+        html += `<div class="section">
+          <h3>
+            <span><span class="status-indicator status-preparing"></span>Being Prepared</span>
+            <span class="badge-count">${preparing.length}</span>
+          </h3>`;
+        
+        preparing.forEach(order => {
+          html += `<div class="order-card">
+            <h4>Order #${order.order_id}</h4>
+            <div class="meta">Chef is preparing your order</div>
+            <div class="amount">Delivery Fee: ₹${order.delivery_amount}</div>
+          </div>`;
+        });
+        html += '</div>';
+      }
+      
+      html += `<div class="section">
+        <h3>
+          <span><span class="status-indicator status-ready"></span>Active Deliveries</span>
+          ${current.length > 0 ? `<span class="badge-count">${current.length}</span>` : ''}
+        </h3>`;
+      
+      if (current.length === 0) {
+        html += '<div class="empty-state" style="padding: 20px;"><p>No active deliveries</p></div>';
+      } else {
+        current.forEach(order => {
+          const isPicked = order.current_status === 'picked_up';
+          const chefAmount = parseFloat(order.total_amount) - parseFloat(order.delivery_amount);
+          
+          html += `<div class="order-card">
+            <h4>Order #${order.order_id}</h4>
+            <div class="meta">
+              ${isPicked ? `Deliver to: ${order.customers?.address || 'Customer'}` : 'Ready for pickup from chef'}
+              <a href="tel:${isPicked ? order.customers?.phone : ''}" class="call-btn">📞 Call</a>
+            </div>
+            <div class="amount">
+              Collect from Customer: ₹${order.total_amount}<br>
+              Pay to Chef: ₹${chefAmount.toFixed(2)}
+            </div>
+            <div class="actions">
+              ${!isPicked ? `<button class="success" onclick="markPickedUp(${order.order_id})">Picked Up from Chef</button>` : ''}
+              ${isPicked ? `<button class="success" onclick="markDelivered(${order.order_id})">Delivered to Customer</button>` : ''}
+            </div>
+          </div>`;
+        });
+      }
       html += '</div>';
     }
     
@@ -329,29 +650,55 @@ function render() {
   
   if (state.tab === 'history') {
     let html = '<div class="container">';
-    html += `<h3>Profile</h3>
+    html += `<div style="background: white; padding: 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--border);">
+      <h3 style="margin-bottom: 12px;">Profile</h3>
       <label>Name</label>
       <input value="${state.user.name}" readonly>
       <label>Phone</label>
       <input value="${state.user.phone}" readonly>
       ${state.user.address ? `<label>Address</label><textarea readonly rows="2">${state.user.address}</textarea>` : ''}
-      
-      <h3 style="margin-top: 24px;">This Month</h3>`;
+    </div>`;
+    
+    html += '<h3 style="margin: 24px 0 16px; font-size: 20px;">This Month\'s Summary</h3>';
     
     if (state.user.role === 'chef') {
       html += `
-        <div class="stat-box"><div class="label">Total Revenue</div><div class="value">₹${state.stats.revenue || 0}</div></div>
-        <div class="stat-box"><div class="label">Service Fee</div><div class="value">₹${state.stats.serviceFee || 0}</div></div>
-        <div class="stat-box"><div class="label">Orders Accepted</div><div class="value">${state.stats.accepted || 0}</div></div>
-        <div class="stat-box"><div class="label">Orders Rejected</div><div class="value">${state.stats.rejected || 0}</div></div>
-        <button ${(state.stats.revenue || 0) === 0 ? 'disabled' : ''}>Pay via UPI</button>`;
+        <div class="stat-box">
+          <div class="label">Total Revenue</div>
+          <div class="value">₹${state.stats.revenue || '0.00'}</div>
+        </div>
+        <div class="stat-box">
+          <div class="label">Service Fee (for self-delivered orders)</div>
+          <div class="value">₹${state.stats.serviceFee || '0.00'}</div>
+        </div>
+        <div class="stat-box">
+          <div class="label">Orders Accepted</div>
+          <div class="value">${state.stats.accepted || 0}</div>
+        </div>
+        <div class="stat-box">
+          <div class="label">Orders Rejected</div>
+          <div class="value">${state.stats.rejected || 0}</div>
+        </div>
+        <button style="width: 100%; margin-top: 12px;" ${parseFloat(state.stats.revenue || 0) === 0 ? 'disabled' : ''}>Pay Platform Fee via UPI</button>`;
     } else {
       html += `
-        <div class="stat-box"><div class="label">Total Revenue</div><div class="value">₹${state.stats.revenue || 0}</div></div>
-        <div class="stat-box"><div class="label">Service Fee</div><div class="value">₹${state.stats.serviceFee || 0}</div></div>
-        <div class="stat-box"><div class="label">Profit</div><div class="value">₹${state.stats.profit || 0}</div></div>
-        <div class="stat-box"><div class="label">Completed</div><div class="value">${state.stats.completed || 0}</div></div>
-        <button ${(state.stats.profit || 0) === 0 ? 'disabled' : ''}>Pay via UPI</button>`;
+        <div class="stat-box">
+          <div class="label">Total Revenue</div>
+          <div class="value">₹${state.stats.revenue || '0.00'}</div>
+        </div>
+        <div class="stat-box">
+          <div class="label">Service Fee (20%)</div>
+          <div class="value">₹${state.stats.serviceFee || '0.00'}</div>
+        </div>
+        <div class="stat-box">
+          <div class="label">Your Profit</div>
+          <div class="value" style="color: var(--success);">₹${state.stats.profit || '0.00'}</div>
+        </div>
+        <div class="stat-box">
+          <div class="label">Deliveries Completed</div>
+          <div class="value">${state.stats.completed || 0}</div>
+        </div>
+        <button style="width: 100%; margin-top: 12px;" ${parseFloat(state.stats.profit || 0) === 0 ? 'disabled' : ''}>Claim Earnings via UPI</button>`;
     }
     
     html += '</div>';
@@ -359,6 +706,7 @@ function render() {
   }
 }
 
+// Auto-login if user data exists
 if (state.user) {
   showApp();
 }

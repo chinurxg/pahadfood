@@ -19,14 +19,15 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--pri
   height: 20vh; display: flex; align-items: center; justify-content: center; 
 }
 .header h1 { font-family: 'Playfair Display', serif; font-size: 2.5rem; letter-spacing: 2px; }
-.container { padding: 16px; max-width: 600px; margin: 0 auto; }
+.container { padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 140px; }
 select, input, textarea { 
   width: 100%; padding: 12px; margin: 8px 0; border: 1px solid var(--border); 
-  border-radius: 4px; font-size: 15px; font-family: inherit; 
+  border-radius: 6px; font-size: 15px; font-family: inherit; 
 }
 .menu-item { 
   display: flex; gap: 12px; padding: 12px; border: 1px solid var(--border); 
-  border-radius: 8px; margin: 8px 0; align-items: center; 
+  border-radius: 8px; margin: 8px 0; align-items: center; background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 .menu-item .left { flex: 1; }
 .menu-item h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
@@ -50,8 +51,20 @@ select, input, textarea {
 }
 .proceed-bar { 
   position: fixed; bottom: 60px; left: 0; right: 0; background: var(--bg); 
-  border-top: 1px solid var(--border); padding: 12px 16px; display: flex; 
-  justify-content: space-between; align-items: center; z-index: 100; 
+  border-top: 1px solid var(--border); padding: 12px 16px; z-index: 100; 
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+}
+.proceed-bar .selection-info {
+  font-size: 13px;
+  color: var(--secondary);
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.proceed-bar .price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .proceed-bar button { 
   padding: 12px 32px; background: var(--primary); color: white; border: none; 
@@ -70,8 +83,9 @@ select, input, textarea {
 .bottom-nav div:not(.active) { color: var(--secondary); }
 .order-card { 
   border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin: 8px 0; 
+  background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
-.order-card h4 { font-size: 14px; margin-bottom: 8px; }
+.order-card h4 { font-size: 14px; margin-bottom: 8px; font-weight: 600; }
 .order-card .status { 
   display: inline-block; padding: 4px 12px; background: #f5f5f5; 
   border-radius: 20px; font-size: 12px; margin-top: 8px; 
@@ -91,6 +105,39 @@ select, input, textarea {
 }
 .hidden { display: none !important; }
 label { display: block; font-size: 14px; margin: 12px 0 4px; font-weight: 500; }
+
+/* Shimmer loading effect */
+.shimmer-wrapper { padding: 16px; }
+.shimmer { 
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+  margin: 8px 0;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.shimmer-item {
+  height: 96px;
+  margin: 12px 0;
+}
+.shimmer-select {
+  height: 48px;
+  margin: 8px 0;
+}
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--secondary);
+}
+.empty-state svg {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
 </style>
 </head>
 <body>
@@ -100,8 +147,11 @@ label { display: block; font-size: 14px; margin: 12px 0 4px; font-weight: 500; }
 <div id="app"></div>
 
 <div id="proceedBar" class="proceed-bar hidden">
-  <span id="totalPrice">₹0</span>
-  <button onclick="checkout()">Proceed</button>
+  <div class="selection-info" id="selectionInfo"></div>
+  <div class="price-row">
+    <span id="totalPrice">₹0</span>
+    <button onclick="checkout()" id="proceedBtn">Proceed</button>
+  </div>
 </div>
 
 <div class="bottom-nav">
@@ -132,7 +182,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
-window.state = { tab: 'menu', cart: {}, cities: [], chefs: [], menu: [], orders: [], customer: JSON.parse(localStorage.getItem('customer') || '{}') };
+window.state = { 
+  tab: 'menu', 
+  cart: {}, 
+  cities: [], 
+  chefs: [], 
+  menu: [], 
+  orders: [], 
+  customer: JSON.parse(localStorage.getItem('customer') || '{}'),
+  selectedCity: localStorage.getItem('selectedCity') || null,
+  selectedCityName: localStorage.getItem('selectedCityName') || null,
+  selectedChef: localStorage.getItem('selectedChef') || null,
+  selectedChefName: localStorage.getItem('selectedChefName') || null,
+  loading: true,
+  processingInterval: null
+};
 
 async function initFCM() {
   try {
@@ -149,22 +213,29 @@ onMessage(messaging, (payload) => {
 });
 
 async function loadCities() {
+  state.loading = true;
+  render();
   const { data } = await supabase.from('cities').select('*').eq('is_active', true);
   state.cities = data || [];
+  state.loading = false;
   render();
 }
 
 async function loadChefs(cityId) {
+  state.loading = true;
+  render();
   const { data } = await supabase.from('chefs').select('*').eq('city_id', cityId).eq('is_active', true);
   state.chefs = data || [];
-  state.selectedChef = null;
+  state.loading = false;
   render();
 }
 
 async function loadMenu(chefId) {
+  state.loading = true;
+  render();
   const { data } = await supabase.from('menu').select('*').eq('chef_id', chefId).eq('is_available', true);
   state.menu = data || [];
-  state.selectedChef = chefId;
+  state.loading = false;
   render();
 }
 
@@ -193,28 +264,45 @@ async function loadHistory() {
 }
 
 window.switchTab = (tab) => {
+  // Clear any existing interval
+  if (state.processingInterval) {
+    clearInterval(state.processingInterval);
+    state.processingInterval = null;
+  }
+  
   state.tab = tab;
   document.querySelectorAll('.bottom-nav div').forEach((el, i) => {
     el.classList.toggle('active', ['menu', 'processing', 'history'][i] === tab);
   });
-  if (tab === 'processing') loadOrders();
+  
+  if (tab === 'processing') {
+    loadOrders();
+    // Auto-refresh every 5 seconds
+    state.processingInterval = setInterval(loadOrders, 5000);
+  }
   if (tab === 'history') loadHistory();
+  
   render();
 };
 
-window.updateQty = (itemId, delta) => {
-  state.cart[itemId] = Math.max(0, (state.cart[itemId] || 0) + delta);
-  if (state.cart[itemId] === 0) delete state.cart[itemId];
+window.updateQty = (itemId, change) => {
+  const current = state.cart[itemId] || 0;
+  const newQty = current + change;
+  if (newQty <= 0) {
+    delete state.cart[itemId];
+  } else {
+    state.cart[itemId] = newQty;
+  }
   render();
 };
 
-window.checkout = async () => {
-  const total = Object.entries(state.cart).reduce((sum, [id, qty]) => {
+window.checkout = () => {
+  const cartTotal = Object.entries(state.cart).reduce((sum, [id, qty]) => {
     const item = state.menu.find(m => m.item_id == id);
     return sum + (item?.price || 0) * qty;
   }, 0);
   
-  if (total < 100) {
+  if (cartTotal < 100) {
     showToast('Add items worth at least ₹100 to continue');
     return;
   }
@@ -228,53 +316,69 @@ window.placeOrder = async () => {
   const phone = document.getElementById('custPhone').value;
   const address = document.getElementById('custAddress').value;
   const city = document.getElementById('custCity').value;
-  const instructions = document.getElementById('deliveryInst').value;
-  const specialInst = document.getElementById('specialInst').value;
   const deliveryType = document.getElementById('deliveryType').value;
+  const specialInst = document.getElementById('specialInst').value;
+  const deliveryInst = document.getElementById('deliveryInst').value;
   
   if (!name || !phone || !address) {
     showToast('Please fill all required fields');
     return;
   }
   
+  // Get or create customer
   let customerId = state.customer.customer_id;
-  
   if (!customerId) {
     const { data: existing } = await supabase.from('customers').select('*').eq('phone', phone).single();
     if (existing) {
       customerId = existing.customer_id;
-      state.customer = existing;
     } else {
-      const { data: newCust } = await supabase.from('customers').insert({
-        name, phone, address, city_id: state.selectedCity
+      const { data: newCustomer } = await supabase.from('customers').insert({ 
+        name, phone, address, city_id: city 
       }).select().single();
-      customerId = newCust.customer_id;
-      state.customer = newCust;
+      customerId = newCustomer.customer_id;
     }
+    state.customer = { customer_id: customerId, name, phone, address, city_id: city };
+    localStorage.setItem('customer', JSON.stringify(state.customer));
+  } else {
+    await supabase.from('customers').update({ name, phone, address }).eq('customer_id', customerId);
+    state.customer = { ...state.customer, name, phone, address };
     localStorage.setItem('customer', JSON.stringify(state.customer));
   }
   
-  const items = Object.entries(state.cart).map(([id, qty]) => {
+  const cartTotal = Object.entries(state.cart).reduce((sum, [id, qty]) => {
     const item = state.menu.find(m => m.item_id == id);
-    return { item_id: id, chef_id: item.chef_id, quantity: qty, price_at_order_time: item.price, chef_amount: item.price * qty };
-  });
+    return sum + (item?.price || 0) * qty;
+  }, 0);
   
-  const subtotal = items.reduce((s, i) => s + i.chef_amount, 0);
-  const deliveryAmount = deliveryType === 'delivery' ? 30 : 0;
-  const platformFee = 10;
-  const total = subtotal + deliveryAmount + platformFee;
+  // Calculate charges - only for delivery
+  const deliveryAmount = deliveryType === 'delivery' ? 50 : 0;
+  const platformFee = deliveryType === 'delivery' ? 10 : 0; // Service fee included in delivery
+  const totalAmount = cartTotal + deliveryAmount;
   
   const { data: order } = await supabase.from('orders').insert({
     customer_id: customerId,
-    city_id: state.selectedCity,
+    city_id: city,
     delivery_type: deliveryType,
     current_status: 'placed',
     delivery_amount: deliveryAmount,
     platform_fee: platformFee,
-    total_amount: total
+    total_amount: totalAmount
   }).select().single();
   
-  await supabase.from('order_items').insert(items.map(i => ({ ...i, order_id: order.order_id })));
+  // Insert order items
+  for (const [itemId, qty] of Object.entries(state.cart)) {
+    const item = state.menu.find(m => m.item_id == itemId);
+    const chefAmount = item.price * qty - (deliveryType === 'delivery' ? (platformFee * (item.price * qty) / totalAmount) : 0);
+    
+    await supabase.from('order_items').insert({
+      order_id: order.order_id,
+      item_id: itemId,
+      chef_id: item.chef_id,
+      quantity: qty,
+      price_at_order_time: item.price,
+      chef_amount: chefAmount
+    });
+  }
   
   await supabase.from('order_status_history').insert({
     order_id: order.order_id,
@@ -293,6 +397,11 @@ window.updateCustomer = async () => {
   const phone = document.getElementById('histPhone').value;
   const address = document.getElementById('histAddress').value;
   
+  if (!state.customer.customer_id) {
+    showToast('Please place an order first');
+    return;
+  }
+  
   await supabase.from('customers').update({ name, phone, address }).eq('customer_id', state.customer.customer_id);
   state.customer = { ...state.customer, name, phone, address };
   localStorage.setItem('customer', JSON.stringify(state.customer));
@@ -310,6 +419,7 @@ function render() {
   const app = document.getElementById('app');
   const proceedBar = document.getElementById('proceedBar');
   const totalPrice = document.getElementById('totalPrice');
+  const selectionInfo = document.getElementById('selectionInfo');
   
   const cartTotal = Object.entries(state.cart).reduce((sum, [id, qty]) => {
     const item = state.menu.find(m => m.item_id == id);
@@ -317,9 +427,24 @@ function render() {
   }, 0);
   
   const hasItems = Object.keys(state.cart).length > 0;
-  proceedBar.classList.toggle('hidden', !hasItems || state.tab !== 'menu' || state.checkoutStep);
+  
+  // Show proceed bar when in menu tab with items OR when city/chef is selected
+  const showProceedBar = (state.tab === 'menu' && !state.checkoutStep) && (hasItems || state.selectedCityName);
+  proceedBar.classList.toggle('hidden', !showProceedBar);
+  
+  // Update selection info
+  if (state.selectedCityName && state.selectedChefName) {
+    selectionInfo.textContent = `${state.selectedCityName} • ${state.selectedChefName}`;
+  } else if (state.selectedCityName) {
+    selectionInfo.textContent = state.selectedCityName;
+  } else {
+    selectionInfo.textContent = '';
+  }
+  
   totalPrice.textContent = '₹' + cartTotal;
-  proceedBar.querySelector('button').disabled = cartTotal < 100;
+  const proceedBtn = document.getElementById('proceedBtn');
+  proceedBtn.disabled = cartTotal < 100;
+  proceedBtn.style.display = hasItems ? 'block' : 'none';
   
   if (state.checkoutStep === 'details') {
     const items = Object.entries(state.cart).map(([id, qty]) => {
@@ -327,46 +452,42 @@ function render() {
       return `<div><span>${item.item_name} x${qty}</span><span>₹${item.price * qty}</span></div>`;
     }).join('');
     
-    const deliveryFee = 30;
-    const platformFee = 10;
-    const total = cartTotal + deliveryFee + platformFee;
-    
     app.innerHTML = `<div class="container checkout">
       <h2>Order Summary</h2>
       <div class="item-list">${items}</div>
       <div class="total">Subtotal: ₹${cartTotal}</div>
       
       <label>Special Instructions for Chef</label>
-      <textarea id="specialInst" rows="2"></textarea>
+      <textarea id="specialInst" rows="2" placeholder="Optional"></textarea>
       
       <label>Name *</label>
-      <input id="custName" value="${state.customer.name || ''}" required>
+      <input id="custName" value="${state.customer.name || ''}" placeholder="Your name" required>
       
       <label>Phone *</label>
-      <input id="custPhone" value="${state.customer.phone || ''}" required>
+      <input id="custPhone" value="${state.customer.phone || ''}" placeholder="10 digit mobile number" required>
       
-      <label>Address *</label>
-      <textarea id="custAddress" rows="2" required>${state.customer.address || ''}</textarea>
+      <label>Address in ${state.selectedCityName || 'selected area'} *</label>
+      <textarea id="custAddress" rows="2" required placeholder="House no, street, landmark">${state.customer.address || ''}</textarea>
       
       <input type="hidden" id="custCity" value="${state.selectedCity}">
       
       <label>Delivery Instructions</label>
-      <input id="deliveryInst">
+      <input id="deliveryInst" placeholder="Optional delivery notes">
       
       <label>Delivery Option</label>
-      <select id="deliveryType">
-        <option value="delivery">Home Delivery (₹30)</option>
+      <select id="deliveryType" onchange="updateDeliveryTotal()">
+        <option value="delivery">Home Delivery (+₹50)</option>
         <option value="self_pickup">Pickup from Chef (Free)</option>
       </select>
       
       <div style="margin-top: 16px; padding: 12px; background: #f9f9f9; border-radius: 6px;">
         <div style="display: flex; justify-content: space-between; margin: 4px 0;">
-          <span>Delivery Fee</span><span>₹30</span>
+          <span>Food Total</span><span>₹${cartTotal}</span>
         </div>
-        <div style="display: flex; justify-content: space-between; margin: 4px 0;">
-          <span>Platform Fee</span><span>₹10</span>
+        <div id="deliveryFeeRow" style="display: flex; justify-content: space-between; margin: 4px 0;">
+          <span>Delivery Charges</span><span>₹50</span>
         </div>
-        <div class="total">Total: ₹${total}</div>
+        <div class="total" id="finalTotal">Total: ₹${cartTotal + 50}</div>
       </div>
       
       <button onclick="placeOrder()" style="width: 100%; margin-top: 16px; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer;">Place Order</button>
@@ -378,33 +499,63 @@ function render() {
   if (state.tab === 'menu') {
     let html = '<div class="container">';
     
-    html += '<select onchange="loadChefs(this.value); state.selectedCity = this.value;"><option value="">Select City</option>';
-    state.cities.forEach(c => html += `<option value="${c.city_id}">${c.city_name}</option>`);
-    html += '</select>';
-    
-    if (state.selectedCity) {
-      html += '<select onchange="loadMenu(this.value)"><option value="">Select Chef</option>';
-      state.chefs.forEach(c => html += `<option value="${c.chef_id}">${c.name}</option>`);
+    // City selection
+    if (state.loading && state.cities.length === 0) {
+      html += '<div class="shimmer shimmer-select"></div>';
+    } else {
+      html += `<select onchange="handleCityChange(this)" id="citySelect">
+        <option value="">Select City/Town/Area</option>`;
+      state.cities.forEach(c => {
+        html += `<option value="${c.city_id}" ${state.selectedCity == c.city_id ? 'selected' : ''}>${c.city_name}</option>`;
+      });
       html += '</select>';
     }
     
-    state.menu.forEach(item => {
-      const qty = state.cart[item.item_id] || 0;
-      html += `<div class="menu-item">
-        <div class="left">
-          <h3>${item.item_name}</h3>
-          <div class="price">₹${item.price}</div>
-          <div class="controls">
-            <button onclick="updateQty(${item.item_id}, -1)" ${qty === 0 ? 'disabled' : ''}>−</button>
-            <button onclick="updateQty(${item.item_id}, 1)">+</button>
-          </div>
-        </div>
-        <div class="img-wrap">
-          <img src="${item.image_url}" alt="${item.item_name}">
-          ${qty > 0 ? `<div class="badge">${qty}</div>` : ''}
-        </div>
+    // Chef selection
+    if (state.selectedCity) {
+      if (state.loading && state.chefs.length === 0) {
+        html += '<div class="shimmer shimmer-select"></div>';
+      } else {
+        html += `<select onchange="handleChefChange(this)" id="chefSelect">
+          <option value="">Select Chef</option>`;
+        state.chefs.forEach(c => {
+          html += `<option value="${c.chef_id}" ${state.selectedChef == c.chef_id ? 'selected' : ''}>${c.name}</option>`;
+        });
+        html += '</select>';
+      }
+    }
+    
+    // Menu items
+    if (state.loading && state.menu.length === 0 && state.selectedChef) {
+      for (let i = 0; i < 3; i++) {
+        html += '<div class="shimmer shimmer-item"></div>';
+      }
+    } else if (state.menu.length === 0 && state.selectedChef) {
+      html += `<div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 3h18v18H3z"/><path d="M9 9h6v6H9z"/>
+        </svg>
+        <p>No items available</p>
       </div>`;
-    });
+    } else {
+      state.menu.forEach(item => {
+        const qty = state.cart[item.item_id] || 0;
+        html += `<div class="menu-item">
+          <div class="left">
+            <h3>${item.item_name}</h3>
+            <div class="price">₹${item.price}</div>
+            <div class="controls">
+              <button onclick="updateQty(${item.item_id}, -1)" ${qty === 0 ? 'disabled' : ''}>−</button>
+              <button onclick="updateQty(${item.item_id}, 1)">+</button>
+            </div>
+          </div>
+          <div class="img-wrap">
+            <img src="${item.image_url}" alt="${item.item_name}">
+            ${qty > 0 ? `<div class="badge">${qty}</div>` : ''}
+          </div>
+        </div>`;
+      });
+    }
     
     html += '</div>';
     app.innerHTML = html;
@@ -413,7 +564,12 @@ function render() {
   if (state.tab === 'processing') {
     let html = '<div class="container">';
     if (state.orders.length === 0) {
-      html += '<p style="text-align: center; margin-top: 40px; color: var(--secondary);">No active orders</p>';
+      html += `<div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+        </svg>
+        <p>No active orders</p>
+      </div>`;
     } else {
       state.orders.forEach(order => {
         const statusMap = {
@@ -439,35 +595,118 @@ function render() {
     let html = '<div class="container">';
     html += `<h3 style="margin: 16px 0;">Your Details</h3>
       <label>Name</label>
-      <input id="histName" value="${state.customer.name || ''}">
+      <input id="histName" value="${state.customer.name || ''}" placeholder="Your name">
       <label>Phone</label>
-      <input id="histPhone" value="${state.customer.phone || ''}">
+      <input id="histPhone" value="${state.customer.phone || ''}" placeholder="10 digit mobile">
       <label>Address</label>
-      <textarea id="histAddress" rows="2">${state.customer.address || ''}</textarea>
+      <textarea id="histAddress" rows="2" placeholder="Your address">${state.customer.address || ''}</textarea>
       <button onclick="updateCustomer()" style="margin-top: 8px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer;">Update</button>
       
       <h3 style="margin: 24px 0 16px;">This Month's Orders</h3>`;
     
-    (state.history || []).forEach(order => {
-      html += `<div class="order-card">
-        <h4>Order #${order.order_id}</h4>
-        <div style="font-size: 12px; color: var(--secondary);">${new Date(order.created_at).toLocaleDateString()}</div>
-        ${order.order_items.map(i => `<div style="font-size: 13px;">${i.menu.item_name} x${i.quantity}</div>`).join('')}
-        <div style="font-weight: 600; margin-top: 8px;">₹${order.total_amount}</div>
+    if ((state.history || []).length === 0) {
+      html += `<div class="empty-state" style="padding: 20px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 48px; height: 48px;">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M9 11h6M9 15h3"/>
+        </svg>
+        <p>No orders this month</p>
       </div>`;
-    });
+    } else {
+      (state.history || []).forEach(order => {
+        html += `<div class="order-card">
+          <h4>Order #${order.order_id}</h4>
+          <div style="font-size: 12px; color: var(--secondary);">${new Date(order.created_at).toLocaleDateString()}</div>
+          ${order.order_items.map(i => `<div style="font-size: 13px;">${i.menu.item_name} x${i.quantity}</div>`).join('')}
+          <div style="font-weight: 600; margin-top: 8px;">₹${order.total_amount}</div>
+        </div>`;
+      });
+    }
     html += '</div>';
     app.innerHTML = html;
   }
 }
+
+window.handleCityChange = function(select) {
+  const cityId = select.value;
+  state.selectedCity = cityId;
+  state.selectedChef = null;
+  state.selectedChefName = null;
+  state.menu = [];
+  state.cart = {};
+  
+  const cityName = state.cities.find(c => c.city_id == cityId)?.city_name || '';
+  state.selectedCityName = cityName;
+  
+  localStorage.setItem('selectedCity', cityId);
+  localStorage.setItem('selectedCityName', cityName);
+  localStorage.removeItem('selectedChef');
+  localStorage.removeItem('selectedChefName');
+  
+  if (cityId) {
+    loadChefs(cityId);
+  } else {
+    state.chefs = [];
+    render();
+  }
+};
+
+window.handleChefChange = function(select) {
+  const chefId = select.value;
+  state.selectedChef = chefId;
+  state.cart = {};
+  
+  const chefName = state.chefs.find(c => c.chef_id == chefId)?.name || '';
+  state.selectedChefName = chefName;
+  
+  localStorage.setItem('selectedChef', chefId);
+  localStorage.setItem('selectedChefName', chefName);
+  
+  if (chefId) {
+    loadMenu(chefId);
+  } else {
+    state.menu = [];
+    render();
+  }
+};
+
+window.updateDeliveryTotal = function() {
+  const deliveryType = document.getElementById('deliveryType').value;
+  const deliveryFeeRow = document.getElementById('deliveryFeeRow');
+  const finalTotal = document.getElementById('finalTotal');
+  
+  const cartTotal = Object.entries(state.cart).reduce((sum, [id, qty]) => {
+    const item = state.menu.find(m => m.item_id == id);
+    return sum + (item?.price || 0) * qty;
+  }, 0);
+  
+  if (deliveryType === 'self_pickup') {
+    deliveryFeeRow.style.display = 'none';
+    finalTotal.textContent = 'Total: ₹' + cartTotal;
+  } else {
+    deliveryFeeRow.style.display = 'flex';
+    finalTotal.textContent = 'Total: ₹' + (cartTotal + 50);
+  }
+};
 
 window.supabase = supabase;
 window.loadChefs = loadChefs;
 window.loadMenu = loadMenu;
 window.loadOrders = loadOrders;
 
+// Initialize
 loadCities();
 initFCM();
+
+// Load remembered selections
+if (state.selectedCity) {
+  loadChefs(state.selectedCity).then(() => {
+    if (state.selectedChef) {
+      loadMenu(state.selectedChef);
+    }
+  });
+}
+
 render();
 </script>
 
