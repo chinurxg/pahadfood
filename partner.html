@@ -98,6 +98,24 @@ label { display: block; font-size: 14px; margin: 12px 0 4px; font-weight: 500; }
 .stat-box .label { font-size: 13px; color: var(--secondary); }
 .stat-box .value { font-size: 24px; font-weight: 700; margin-top: 4px; color: var(--primary); }
 
+.stat-box.paid {
+  background: #e8f5e9;
+  border: 2px solid var(--success);
+}
+
+.stat-box.paid .value {
+  color: var(--success);
+}
+
+.stat-box.paid .label {
+  color: var(--success);
+}
+
+.stat-box.pending {
+  background: #fff3e0;
+  border: 2px solid var(--warning);
+}
+
 .shimmer-wrapper { padding: 16px; }
 .shimmer { 
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -281,6 +299,76 @@ label { display: block; font-size: 14px; margin: 12px 0 4px; font-weight: 500; }
   width: 100%;
   max-width: 300px;
 }
+
+.payment-history {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+}
+
+.payment-history .history-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.payment-history .history-item:last-child {
+  border-bottom: none;
+}
+
+.payment-history .history-label {
+  font-size: 13px;
+  color: var(--secondary);
+}
+
+.payment-history .history-value {
+  font-weight: 600;
+  color: var(--success);
+}
+
+.fee-summary {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.fee-summary .fee-card {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.fee-summary .fee-card.paid-card {
+  background: #e8f5e9;
+  border: 2px solid var(--success);
+}
+
+.fee-summary .fee-card.pending-card {
+  background: #fff3e0;
+  border: 2px solid var(--warning);
+}
+
+.fee-summary .fee-label {
+  font-size: 12px;
+  color: var(--secondary);
+  margin-bottom: 4px;
+}
+
+.fee-summary .fee-value {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.fee-summary .paid-card .fee-value {
+  color: var(--success);
+}
+
+.fee-summary .pending-card .fee-value {
+  color: var(--warning);
+}
 </style>
 </head>
 <body>
@@ -333,7 +421,7 @@ label { display: block; font-size: 14px; margin: 12px 0 4px; font-weight: 500; }
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js';
 
-const supabase = window.supabase.createClient(
+const partnerSupabase = window.supabase.createClient(
   'https://zjuugofcrnieigciaclb.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdXVnb2Zjcm5pZWlnY2lhY2xiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzY4ODYsImV4cCI6MjA4NTU1Mjg4Nn0.pAMtzCz5aM7vxGT_ZVK7TPzumdFXoroQfxaCUt8xmVI'
 );
@@ -361,7 +449,9 @@ window.state = {
   historyOrders: [],
   historyPage: 0,
   historyLoading: false,
-  historyHasMore: true
+  historyHasMore: true,
+  partnerInfo: null,
+  paymentHistory: []
 };
 
 // Toast notification function
@@ -429,7 +519,7 @@ async function initFCM() {
     if (token && state.user) {
       const table = state.user.role === 'chef' ? 'chefs' : 'deliverers';
       const idField = state.user.role === 'chef' ? 'chef_id' : 'deliverer_id';
-      await supabase.from(table).update({ fcm_token: token }).eq(idField, state.user.id);
+      await partnerSupabase.from(table).update({ fcm_token: token }).eq(idField, state.user.id);
     }
   } catch (e) { 
     console.error('FCM error:', e); 
@@ -454,7 +544,7 @@ window.login = async () => {
     return;
   }
   
-  const { data: chef } = await supabase.from('chefs').select('*').eq('phone', username).single();
+  const { data: chef } = await partnerSupabase.from('chefs').select('*').eq('phone', username).single();
   if (chef && chef.password_hash === password) {
     state.user = { 
       id: chef.chef_id, 
@@ -470,7 +560,7 @@ window.login = async () => {
     return;
   }
   
-  const { data: delivery } = await supabase.from('deliverers').select('*').eq('phone', username).single();
+  const { data: delivery } = await partnerSupabase.from('deliverers').select('*').eq('phone', username).single();
   if (delivery && delivery.phone === password) {
     state.user = { 
       id: delivery.deliverer_id, 
@@ -493,6 +583,8 @@ window.logout = () => {
   state.orders = [];
   state.historyOrders = [];
   state.historyPage = 0;
+  state.partnerInfo = null;
+  state.paymentHistory = [];
   localStorage.removeItem('partner');
   stopPolling();
   document.getElementById('loginScreen').classList.remove('hidden');
@@ -530,6 +622,7 @@ window.switchTab = (tab) => {
       loadHistoryOrders();
     }
     loadStats();
+    loadPaymentHistory();
   }
   
   render();
@@ -556,7 +649,7 @@ async function checkForNewOrders() {
     let newOrderIds = new Set();
     
     if (state.user.role === 'chef') {
-      const { data: items } = await supabase
+      const { data: items } = await partnerSupabase
         .from('order_items')
         .select('orders!inner(order_id, current_status)')
         .eq('chef_id', state.user.id)
@@ -566,7 +659,7 @@ async function checkForNewOrders() {
         newOrderIds.add(item.orders.order_id);
       });
     } else {
-      const { data } = await supabase
+      const { data } = await partnerSupabase
         .from('orders')
         .select('order_id')
         .eq('city_id', state.user.city_id)
@@ -588,13 +681,48 @@ async function checkForNewOrders() {
   }
 }
 
+async function loadPartnerInfo() {
+  try {
+    const table = state.user.role === 'chef' ? 'chefs' : 'deliverers';
+    const idField = state.user.role === 'chef' ? 'chef_id' : 'deliverer_id';
+    
+    const { data } = await partnerSupabase.from(table).select('*').eq(idField, state.user.id).single();
+    state.partnerInfo = data;
+  } catch (error) {
+    console.error('Error loading partner info:', error);
+  }
+}
+
+async function loadPaymentHistory() {
+  try {
+    const table = state.user.role === 'chef' ? 'chef_payments' : 'delivery_payments';
+    const idField = state.user.role === 'chef' ? 'chef_id' : 'deliverer_id';
+    
+    const { data, error } = await partnerSupabase
+      .from(table)
+      .select('*')
+      .eq(idField, state.user.id)
+      .order('payment_date', { ascending: false });
+    
+    if (error) {
+      console.error('Error loading payment history:', error);
+      state.paymentHistory = [];
+    } else {
+      state.paymentHistory = data || [];
+    }
+  } catch (error) {
+    console.error('Error loading payment history:', error);
+    state.paymentHistory = [];
+  }
+}
+
 async function loadOrders() {
   state.loading = true;
   render();
   
   try {
     if (state.user.role === 'chef') {
-      const { data: items, error } = await supabase
+      const { data: items, error } = await partnerSupabase
         .from('order_items')
         .select(`
           *,
@@ -632,7 +760,7 @@ async function loadOrders() {
         state.orders = Object.values(ordersMap);
       }
     } else {
-      const { data, error } = await supabase
+      const { data, error } = await partnerSupabase
         .from('orders')
         .select(`
           *,
@@ -664,11 +792,13 @@ async function loadOrders() {
 }
 
 async function loadStats() {
+  await loadPartnerInfo();
+  
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   
   if (state.user.role === 'chef') {
-    const { data: orders } = await supabase.from('orders')
+    const { data: orders } = await partnerSupabase.from('orders')
       .select('*, order_items!inner(*)')
       .eq('order_items.chef_id', state.user.id)
       .eq('current_status', 'delivered')
@@ -679,51 +809,69 @@ async function loadStats() {
     let selfDeliveryCount = 0;
     
     (orders || []).forEach(order => {
-      // Calculate food amount (total - delivery fee)
       const deliveryFee = order.delivery_type === 'delivery' ? parseFloat(order.delivery_amount || 50) : 0;
       const foodAmount = parseFloat(order.total_amount) - deliveryFee;
       
       totalFoodRevenue += foodAmount;
       
-      // Check if this chef delivered the order (using delivered_by_chef_id)
       if (order.delivery_type === 'delivery' && order.delivered_by_chef_id === state.user.id) {
-        totalDeliveryRevenue += 50; // Chef collected ₹50 delivery fee
+        totalDeliveryRevenue += 50;
         selfDeliveryCount++;
       }
     });
     
-    // Platform fee: ₹10 per self-delivered order ONLY
     const platformFee = selfDeliveryCount * 10;
-    const netDeliveryRevenue = totalDeliveryRevenue - platformFee; // ₹40 per delivery kept by chef
+    const netDeliveryRevenue = totalDeliveryRevenue - platformFee;
+    
+    // Calculate total paid from payment history
+    const currentMonthPayments = state.paymentHistory.filter(p => {
+      const paymentDate = new Date(p.payment_date);
+      return paymentDate >= new Date(startOfMonth);
+    });
+    
+    const totalPaid = currentMonthPayments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+    const pendingFee = platformFee - totalPaid;
     
     state.stats = {
       foodRevenue: totalFoodRevenue.toFixed(2),
       deliveryRevenue: totalDeliveryRevenue.toFixed(2),
       netDeliveryRevenue: netDeliveryRevenue.toFixed(2),
       platformFee: platformFee.toFixed(2),
+      totalPaid: totalPaid.toFixed(2),
+      pendingFee: Math.max(0, pendingFee).toFixed(2),
       totalOrders: (orders || []).length,
-      selfDeliveryCount: selfDeliveryCount
+      selfDeliveryCount: selfDeliveryCount,
+      isPaid: pendingFee <= 0
     };
   } else {
-    const { data: orders } = await supabase.from('orders')
+    const { data: orders } = await partnerSupabase.from('orders')
       .select('*')
       .eq('delivery_person_id', state.user.id)
       .eq('current_status', 'delivered')
       .gte('created_at', startOfMonth);
     
-    // Delivery person collects ₹50 per delivery
-    // Pays ₹10 platform fee
-    // Keeps ₹40 profit
     const deliveryCount = (orders || []).length;
     const totalCollected = deliveryCount * 50;
     const platformFee = deliveryCount * 10;
     const profit = deliveryCount * 40;
     
+    // Calculate total paid from payment history
+    const currentMonthPayments = state.paymentHistory.filter(p => {
+      const paymentDate = new Date(p.payment_date);
+      return paymentDate >= new Date(startOfMonth);
+    });
+    
+    const totalPaid = currentMonthPayments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+    const pendingFee = platformFee - totalPaid;
+    
     state.stats = {
       totalCollected: totalCollected.toFixed(2),
       platformFee: platformFee.toFixed(2),
+      totalPaid: totalPaid.toFixed(2),
+      pendingFee: Math.max(0, pendingFee).toFixed(2),
       profit: profit.toFixed(2),
-      completed: deliveryCount
+      completed: deliveryCount,
+      isPaid: pendingFee <= 0
     };
   }
   render();
@@ -740,7 +888,7 @@ async function loadHistoryOrders() {
     const offset = state.historyPage * limit;
     
     if (state.user.role === 'chef') {
-      const { data, error } = await supabase
+      const { data, error } = await partnerSupabase
         .from('orders')
         .select(`
           *,
@@ -757,7 +905,7 @@ async function loadHistoryOrders() {
       state.historyOrders.push(...(data || []));
       state.historyHasMore = (data?.length || 0) === limit;
     } else {
-      const { data, error } = await supabase
+      const { data, error } = await partnerSupabase
         .from('orders')
         .select(`
           *,
@@ -791,21 +939,18 @@ window.loadMoreHistory = () => {
 
 window.acceptOrder = async (orderId, selfDeliver = false) => {
   if (selfDeliver) {
-    // When chef accepts for self-delivery, skip the "preparing" step
-    // Go directly to picked_up status so chef can deliver immediately
-    // Use delivered_by_chef_id field to track chef deliveries
-    await supabase.from('orders').update({ 
+    await partnerSupabase.from('orders').update({ 
       current_status: 'picked_up',
-      delivered_by_chef_id: state.user.id  // Track in chef delivery field
+      delivered_by_chef_id: state.user.id
     }).eq('order_id', orderId);
     
-    await supabase.from('order_status_history').insert({ 
+    await partnerSupabase.from('order_status_history').insert({ 
       order_id: orderId, 
       status: 'accepted', 
       changed_by: 'chef' 
     });
     
-    await supabase.from('order_status_history').insert({ 
+    await partnerSupabase.from('order_status_history').insert({ 
       order_id: orderId, 
       status: 'picked_up', 
       changed_by: 'chef' 
@@ -813,9 +958,8 @@ window.acceptOrder = async (orderId, selfDeliver = false) => {
     
     showToast('Success', 'Order accepted! Ready to deliver', 'success');
   } else {
-    // Normal accept - order goes to preparing
-    await supabase.from('orders').update({ current_status: 'accepted' }).eq('order_id', orderId);
-    await supabase.from('order_status_history').insert({ 
+    await partnerSupabase.from('orders').update({ current_status: 'accepted' }).eq('order_id', orderId);
+    await partnerSupabase.from('order_status_history').insert({ 
       order_id: orderId, 
       status: 'accepted', 
       changed_by: 'chef' 
@@ -850,8 +994,8 @@ window.selectReason = (reason) => {
 window.confirmReject = async () => {
   if (!state.rejectingOrderId || !state.selectedRejectReason) return;
   
-  await supabase.from('orders').update({ current_status: 'cancelled' }).eq('order_id', state.rejectingOrderId);
-  await supabase.from('order_status_history').insert({ 
+  await partnerSupabase.from('orders').update({ current_status: 'cancelled' }).eq('order_id', state.rejectingOrderId);
+  await partnerSupabase.from('order_status_history').insert({ 
     order_id: state.rejectingOrderId, 
     status: 'cancelled', 
     changed_by: 'chef' 
@@ -862,8 +1006,8 @@ window.confirmReject = async () => {
 };
 
 window.markDone = async (orderId) => {
-  await supabase.from('orders').update({ current_status: 'prepared' }).eq('order_id', orderId);
-  await supabase.from('order_status_history').insert({ 
+  await partnerSupabase.from('orders').update({ current_status: 'prepared' }).eq('order_id', orderId);
+  await partnerSupabase.from('order_status_history').insert({ 
     order_id: orderId, 
     status: 'prepared', 
     changed_by: 'chef' 
@@ -873,8 +1017,8 @@ window.markDone = async (orderId) => {
 };
 
 window.markSelfPickupDelivered = async (orderId) => {
-  await supabase.from('orders').update({ current_status: 'delivered' }).eq('order_id', orderId);
-  await supabase.from('order_status_history').insert({ 
+  await partnerSupabase.from('orders').update({ current_status: 'delivered' }).eq('order_id', orderId);
+  await partnerSupabase.from('order_status_history').insert({ 
     order_id: orderId, 
     status: 'delivered', 
     changed_by: 'chef' 
@@ -884,18 +1028,18 @@ window.markSelfPickupDelivered = async (orderId) => {
 };
 
 window.acceptDelivery = async (orderId) => {
-  await supabase.from('orders').update({ delivery_person_id: state.user.id }).eq('order_id', orderId);
+  await partnerSupabase.from('orders').update({ delivery_person_id: state.user.id }).eq('order_id', orderId);
   showToast('Success', 'Delivery accepted!', 'success');
   loadOrders();
 };
 
 window.acceptChefDelivery = async (orderId) => {
-  await supabase.from('orders').update({ 
+  await partnerSupabase.from('orders').update({ 
     current_status: 'picked_up',
     delivered_by_chef_id: state.user.id 
   }).eq('order_id', orderId);
   
-  await supabase.from('order_status_history').insert({ 
+  await partnerSupabase.from('order_status_history').insert({ 
     order_id: orderId, 
     status: 'picked_up', 
     changed_by: 'chef' 
@@ -906,8 +1050,8 @@ window.acceptChefDelivery = async (orderId) => {
 };
 
 window.markPickedUp = async (orderId) => {
-  await supabase.from('orders').update({ current_status: 'picked_up' }).eq('order_id', orderId);
-  await supabase.from('order_status_history').insert({ 
+  await partnerSupabase.from('orders').update({ current_status: 'picked_up' }).eq('order_id', orderId);
+  await partnerSupabase.from('order_status_history').insert({ 
     order_id: orderId, 
     status: 'picked_up', 
     changed_by: state.user.role === 'chef' ? 'chef' : 'delivery'
@@ -917,14 +1061,30 @@ window.markPickedUp = async (orderId) => {
 };
 
 window.markDelivered = async (orderId) => {
-  await supabase.from('orders').update({ current_status: 'delivered' }).eq('order_id', orderId);
-  await supabase.from('order_status_history').insert({ 
+  await partnerSupabase.from('orders').update({ current_status: 'delivered' }).eq('order_id', orderId);
+  await partnerSupabase.from('order_status_history').insert({ 
     order_id: orderId, 
     status: 'delivered', 
     changed_by: state.user.role === 'chef' ? 'chef' : 'delivery'
   });
   showToast('Success', 'Order delivered! Payment confirmed', 'success');
   loadOrders();
+};
+
+window.payPlatformFee = () => {
+  const WHATSAPP_NUMBER = '917876602575';
+  const amount = parseFloat(state.stats.pendingFee || 0);
+  const partnerType = state.user.role === 'chef' ? 'Chef' : 'Delivery Partner';
+  
+  if (amount === 0) {
+    showToast('Info', 'No pending platform fee', 'info');
+    return;
+  }
+  
+  const message = `Hey! I'm ${state.user.name} (${partnerType}). I'm paying ₹${amount.toFixed(2)} platform fee for this month. Please confirm and update my payment record. Thank you!`;
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  
+  window.open(whatsappUrl, '_blank');
 };
 
 function render() {
@@ -951,10 +1111,9 @@ function render() {
         html += '<div class="empty-state" style="padding: 20px;"><p>No new orders</p></div>';
       } else {
         unanswered.forEach(order => {
-          // Calculate amounts - delivery fee is always ₹50 for delivery orders
           const deliveryFee = order.delivery_type === 'delivery' ? 50 : 0;
           const foodAmount = parseFloat(order.total_amount) - deliveryFee;
-          const customerPayment = parseFloat(order.total_amount); // Food + ₹50
+          const customerPayment = parseFloat(order.total_amount);
           
           html += `<div class="order-card new-order">
             <h4>Order #${order.order_id}</h4>
@@ -1078,19 +1237,14 @@ function render() {
           </h3>`;
         
         selfDelivering.forEach(order => {
-          const deliveryFee = 50; // Always ₹50 for delivery
+          const deliveryFee = 50;
           const foodAmount = parseFloat(order.total_amount) - deliveryFee;
-          const customerPayment = parseFloat(order.total_amount); // Total to collect
+          const customerPayment = parseFloat(order.total_amount);
           
           html += `<div class="order-card payment-pending">
             <h4>Order #${order.order_id}</h4>
             <div class="address" style="font-size: 17px;">
               📍 ${order.customer?.address || 'Delivery address'}
-              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.customer?.address || '')}" 
-                 target="_blank" 
-                 style="display: inline-block; margin-top: 8px; padding: 8px 16px; background: #4285f4; color: white; text-decoration: none; border-radius: 6px; font-size: 14px;">
-                🗺️ Open in Maps
-              </a>
             </div>
             <div class="meta">
               ${order.customer?.name || 'Customer'}
@@ -1216,9 +1370,9 @@ function render() {
         html += '<div class="empty-state" style="padding: 20px;"><p>No active deliveries</p></div>';
       } else {
         current.forEach(order => {
-          const deliveryFee = 50; // Always ₹50
+          const deliveryFee = 50;
           const foodAmount = parseFloat(order.total_amount) - deliveryFee;
-          const customerPayment = parseFloat(order.total_amount); // Total to collect
+          const customerPayment = parseFloat(order.total_amount);
           const chefPhone = order.order_items[0]?.chefs?.phone || '';
           
           html += `<div class="order-card payment-pending">
@@ -1288,11 +1442,24 @@ function render() {
           <div class="value">₹${state.stats.deliveryRevenue || '0.00'}</div>
           <div class="meta" style="margin-top: 8px;">${state.stats.selfDeliveryCount || 0} self-deliveries × ₹50</div>
         </div>
-        <div class="stat-box">
-          <div class="label">Platform Fee (self-deliveries only)</div>
-          <div class="value" style="color: var(--danger);">₹${state.stats.platformFee || '0.00'}</div>
-          <div class="meta" style="margin-top: 8px;">₹10 × ${state.stats.selfDeliveryCount || 0} deliveries</div>
+        
+        <div class="fee-summary">
+          <div class="fee-card paid-card">
+            <div class="fee-label">Already Paid</div>
+            <div class="fee-value">₹${state.stats.totalPaid || '0.00'}</div>
+          </div>
+          <div class="fee-card pending-card">
+            <div class="fee-label">Pending Payment</div>
+            <div class="fee-value">₹${state.stats.pendingFee || '0.00'}</div>
+          </div>
         </div>
+        
+        <div class="stat-box ${parseFloat(state.stats.pendingFee || 0) === 0 ? 'paid' : 'pending'}">
+          <div class="label">Platform Fee Status</div>
+          <div class="value">${parseFloat(state.stats.pendingFee || 0) === 0 ? '✅ All Paid' : '₹' + (state.stats.pendingFee || '0.00') + ' Pending'}</div>
+          ${parseFloat(state.stats.pendingFee || 0) > 0 ? `<div class="meta" style="margin-top: 8px;">Total fee: ₹${state.stats.platformFee || '0.00'} | Paid: ₹${state.stats.totalPaid || '0.00'}</div>` : `<div class="meta" style="margin-top: 8px; color: var(--success);">Thank you for payment!</div>`}
+        </div>
+        
         <div class="stat-box">
           <div class="label">Net Delivery Earnings</div>
           <div class="value" style="color: var(--success);">₹${state.stats.netDeliveryRevenue || '0.00'}</div>
@@ -1301,10 +1468,40 @@ function render() {
         <div class="stat-box">
           <div class="label">Total Orders Completed</div>
           <div class="value">${state.stats.totalOrders || 0}</div>
-        </div>
-        <button style="width: 100%; margin-top: 12px;" ${parseFloat(state.stats.platformFee || 0) === 0 ? 'disabled' : ''}>
-          Pay Platform Fee ₹${state.stats.platformFee || '0.00'} via UPI
-        </button>`;
+        </div>`;
+        
+      if (state.paymentHistory.length > 0) {
+        html += `
+          <div class="payment-history">
+            <h4 style="margin-bottom: 12px; font-size: 16px;">Payment History</h4>`;
+        
+        state.paymentHistory.forEach(payment => {
+          const paymentDate = new Date(payment.payment_date).toLocaleDateString('en-IN', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+          });
+          
+          html += `
+            <div class="history-item">
+              <span class="history-label">📅 ${paymentDate}</span>
+              <span class="history-value">₹${parseFloat(payment.amount || 0).toFixed(2)}</span>
+            </div>`;
+        });
+        
+        html += `</div>`;
+      }
+      
+      html += `
+        ${parseFloat(state.stats.pendingFee || 0) > 0 ? `
+          <button style="width: 100%; margin-top: 12px;" onclick="payPlatformFee()">
+            💬 Pay Pending Fee ₹${state.stats.pendingFee || '0.00'} via WhatsApp
+          </button>
+        ` : `
+          <div style="text-align: center; padding: 16px; margin-top: 12px; background: #e8f5e9; border-radius: 8px; color: var(--success); font-weight: 600;">
+            ✅ All platform fees paid for this month!
+          </div>
+        `}`;
     } else {
       html += `
         <div class="stat-box">
@@ -1312,11 +1509,24 @@ function render() {
           <div class="value">₹${state.stats.totalCollected || '0.00'}</div>
           <div class="meta" style="margin-top: 8px;">${state.stats.completed || 0} deliveries × ₹50</div>
         </div>
-        <div class="stat-box">
-          <div class="label">Platform Fee (pay later)</div>
-          <div class="value" style="color: var(--danger);">₹${state.stats.platformFee || '0.00'}</div>
-          <div class="meta" style="margin-top: 8px;">₹10 per delivery</div>
+        
+        <div class="fee-summary">
+          <div class="fee-card paid-card">
+            <div class="fee-label">Already Paid</div>
+            <div class="fee-value">₹${state.stats.totalPaid || '0.00'}</div>
+          </div>
+          <div class="fee-card pending-card">
+            <div class="fee-label">Pending Payment</div>
+            <div class="fee-value">₹${state.stats.pendingFee || '0.00'}</div>
+          </div>
         </div>
+        
+        <div class="stat-box ${parseFloat(state.stats.pendingFee || 0) === 0 ? 'paid' : 'pending'}">
+          <div class="label">Platform Fee Status</div>
+          <div class="value">${parseFloat(state.stats.pendingFee || 0) === 0 ? '✅ All Paid' : '₹' + (state.stats.pendingFee || '0.00') + ' Pending'}</div>
+          ${parseFloat(state.stats.pendingFee || 0) > 0 ? `<div class="meta" style="margin-top: 8px;">Total fee: ₹${state.stats.platformFee || '0.00'} | Paid: ₹${state.stats.totalPaid || '0.00'}</div>` : `<div class="meta" style="margin-top: 8px; color: var(--success);">Thank you for payment!</div>`}
+        </div>
+        
         <div class="stat-box">
           <div class="label">Your Net Profit</div>
           <div class="value" style="color: var(--success);">₹${state.stats.profit || '0.00'}</div>
@@ -1325,10 +1535,40 @@ function render() {
         <div class="stat-box">
           <div class="label">Deliveries Completed</div>
           <div class="value">${state.stats.completed || 0}</div>
-        </div>
-        <button style="width: 100%; margin-top: 12px;" ${parseFloat(state.stats.profit || 0) === 0 ? 'disabled' : ''}>
-          Claim Earnings ₹${state.stats.profit || '0.00'} via UPI
-        </button>`;
+        </div>`;
+        
+      if (state.paymentHistory.length > 0) {
+        html += `
+          <div class="payment-history">
+            <h4 style="margin-bottom: 12px; font-size: 16px;">Payment History</h4>`;
+        
+        state.paymentHistory.forEach(payment => {
+          const paymentDate = new Date(payment.payment_date).toLocaleDateString('en-IN', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+          });
+          
+          html += `
+            <div class="history-item">
+              <span class="history-label">📅 ${paymentDate}</span>
+              <span class="history-value">₹${parseFloat(payment.amount || 0).toFixed(2)}</span>
+            </div>`;
+        });
+        
+        html += `</div>`;
+      }
+      
+      html += `
+        ${parseFloat(state.stats.pendingFee || 0) > 0 ? `
+          <button style="width: 100%; margin-top: 12px;" onclick="payPlatformFee()">
+            💬 Pay Pending Fee ₹${state.stats.pendingFee || '0.00'} via WhatsApp
+          </button>
+        ` : `
+          <div style="text-align: center; padding: 16px; margin-top: 12px; background: #e8f5e9; border-radius: 8px; color: var(--success); font-weight: 600;">
+            ✅ All platform fees paid for this month!
+          </div>
+        `}`;
     }
     
     // Order History Section
@@ -1341,17 +1581,15 @@ function render() {
         const deliveryFee = order.delivery_type === 'delivery' ? 50 : 0;
         const foodAmount = parseFloat(order.total_amount) - deliveryFee;
         
-        // For chef: show food amount + delivery earning if they delivered
-        // For delivery person: always show ₹40 profit
         let displayAmount;
         if (state.user.role === 'chef') {
           if (order.delivered_by_chef_id === state.user.id) {
-            displayAmount = foodAmount + 40; // Food + net delivery earning
+            displayAmount = foodAmount + 40;
           } else {
-            displayAmount = foodAmount; // Just food
+            displayAmount = foodAmount;
           }
         } else {
-          displayAmount = 40; // Delivery person profit
+          displayAmount = 40;
         }
         
         const orderDate = new Date(order.created_at).toLocaleDateString('en-IN', {
