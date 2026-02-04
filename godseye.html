@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pahad Food - God's Eye Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #000;
+  --accent: #d4af37;
+  --text: #1a1a1a;
+  --text-light: #666;
+  --bg: #fafafa;
+  --card-bg: #fff;
+  --border: #e8e8e8;
+  --success: #2e7d32;
+  --danger: #d32f2f;
+  --warning: #ff9800;
+  --info: #1976d2;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.header {
+  background: var(--primary);
+  color: white;
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+}
+
+.header .subtitle {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.refresh-badge {
+  background: var(--accent);
+  color: var(--primary);
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.btn-primary { background: var(--accent); color: var(--primary); }
+.btn-danger { background: var(--danger); color: white; }
+.btn-success { background: var(--success); color: white; }
+.btn-warning { background: var(--warning); color: white; }
+.btn-info { background: var(--info); color: white; }
+.btn-secondary { background: white; color: var(--primary); border: 1px solid var(--border); }
+
+.btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--primary);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card.live::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: #ff4444;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.stat-card.danger { border-left-color: var(--danger); }
+.stat-card.success { border-left-color: var(--success); }
+.stat-card.warning { border-left-color: var(--warning); }
+.stat-card.info { border-left-color: var(--info); }
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stat-detail {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-top: 8px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+  padding-bottom: 0;
+}
+
+.tab {
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-light);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.section {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--border);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge.placed { background: #fff3e0; color: #f57c00; }
+.badge.accepted { background: #e3f2fd; color: #1976d2; }
+.badge.prepared { background: #f3e5f5; color: #7b1fa2; }
+.badge.picked_up { background: #e8f5e9; color: #388e3c; }
+.badge.delivered { background: #e8f5e9; color: #2e7d32; }
+.badge.cancelled { background: #ffebee; color: #c62828; }
+
+.order-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+
+.order-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.order-card.new-order {
+  border: 2px solid var(--warning);
+  background: #fff8e1;
+  animation: highlight 2s ease-in-out;
+}
+
+@keyframes highlight {
+  0%, 100% { background: #fff8e1; }
+  50% { background: #ffecb3; }
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.order-id {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.order-meta {
+  font-size: 13px;
+  color: var(--text-light);
+  margin: 8px 0;
+}
+
+.order-items {
+  margin: 12px 0;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 6px;
+}
+
+.order-item {
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.order-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.order-actions button {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table thead {
+  background: var(--bg);
+}
+
+.table th {
+  text-align: left;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table tr:hover {
+  background: var(--bg);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.show { display: flex; }
+
+.modal-content {
+  background: var(--card-bg);
+  padding: 32px;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.form-actions button {
+  flex: 1;
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--primary);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  z-index: 1000;
+  animation: slideUp 0.3s ease-out;
+  max-width: 400px;
+}
+
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+.toast.warning { background: var(--warning); }
+.toast.info { background: var(--info); }
+
+@keyframes slideUp {
+  from { transform: translateY(100px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-light);
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+  height: 100px;
+  margin: 12px 0;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.notification-preview {
+  background: var(--bg);
+  padding: 16px;
+  border-radius: 8px;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+}
+
+.notification-preview .title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.notification-preview .message {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.quick-action {
+  padding: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-action:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: var(--primary);
+}
+
+.quick-action .icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.quick-action .label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-indicator.online {
+  background: #e8f5e9;
+  color: var(--success);
+}
+
+.status-indicator.offline {
+  background: #ffebee;
+  color: var(--danger);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.search-box {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+  font-family: inherit;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.partner-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.partner-info {
+  flex: 1;
+}
+
+.partner-name {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.partner-details {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+
+.hidden { display: none !important; }
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .modal-content {
+    padding: 24px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🔮 Pahad Food Command Center</h1>
+    <div class="subtitle">Real-time monitoring & control</div>
+  </div>
+  <div class="header-actions">
+    <div class="refresh-badge" id="autoRefresh">Auto-refresh: ON</div>
+    <button class="btn btn-danger" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Stats Overview -->
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <div class="quick-action" onclick="openNotificationModal()">
+      <div class="icon">📢</div>
+      <div class="label">Send Notification</div>
+    </div>
+    <div class="quick-action" onclick="switchTab('orders')">
+      <div class="icon">📦</div>
+      <div class="label">All Orders</div>
+    </div>
+    <div class="quick-action" onclick="switchTab('partners')">
+      <div class="icon">👥</div>
+      <div class="label">Partners</div>
+    </div>
+    <div class="quick-action" onclick="switchTab('customers')">
+      <div class="icon">🙋</div>
+      <div class="label">Customers</div>
+    </div>
+    <div class="quick-action" onclick="switchTab('issues')">
+      <div class="icon">⚠️</div>
+      <div class="label">Issues</div>
+    </div>
+    <div class="quick-action" onclick="openPaymentModal()">
+      <div class="icon">💰</div>
+      <div class="label">Platform Fees</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('overview')">📊 Overview</div>
+    <div class="tab" onclick="switchTab('orders')">📦 Orders</div>
+    <div class="tab" onclick="switchTab('partners')">👨‍🍳 Partners</div>
+    <div class="tab" onclick="switchTab('customers')">🙋 Customers</div>
+    <div class="tab" onclick="switchTab('issues')">⚠️ Issues</div>
+    <div class="tab" onclick="switchTab('notifications')">📢 Notifications</div>
+  </div>
+
+  <!-- Content -->
+  <div id="tabContent"></div>
+</div>
+
+<!-- Notification Modal -->
+<div class="modal" id="notificationModal">
+  <div class="modal-content">
+    <div class="modal-header">📢 Send Notification</div>
+    
+    <div class="form-group">
+      <label>Send To</label>
+      <select id="notifTarget">
+        <option value="all_chefs">All Chefs</option>
+        <option value="all_deliverers">All Delivery Partners</option>
+        <option value="all_customers">All Customers</option>
+        <option value="specific_chef">Specific Chef</option>
+        <option value="specific_deliverer">Specific Delivery Partner</option>
+        <option value="specific_customer">Specific Customer</option>
+      </select>
+    </div>
+
+    <div class="form-group hidden" id="specificUserGroup">
+      <label>Select User</label>
+      <select id="specificUserId"></select>
+    </div>
+
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" id="notifTitle" placeholder="Notification title">
+    </div>
+
+    <div class="form-group">
+      <label>Message</label>
+      <textarea id="notifMessage" placeholder="Your message here..."></textarea>
+    </div>
+
+    <div class="notification-preview">
+      <div class="title" id="previewTitle">Title will appear here</div>
+      <div class="message" id="previewMessage">Message will appear here</div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="closeNotificationModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="sendNotification()">Send Notification</button>
+    </div>
+  </div>
+</div>
+
+<!-- Issue Resolution Modal -->
+<div class="modal" id="issueModal">
+  <div class="modal-content">
+    <div class="modal-header">🔧 Resolve Issue</div>
+    <div id="issueDetails"></div>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal" id="paymentModal">
+  <div class="modal-content">
+    <div class="modal-header">💰 Platform Fee Management</div>
+    <div id="paymentDetails"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const adminSupabase = window.supabase.createClient(
+  'https://zjuugofcrnieigciaclb.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdXVnb2Zjcm5pZWlnY2lhY2xiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzY4ODYsImV4cCI6MjA4NTU1Mjg4Nn0.pAMtzCz5aM7vxGT_ZVK7TPzumdFXoroQfxaCUt8xmVI'
+);
+
+let state = {
+  tab: 'overview',
+  loading: false,
+  autoRefresh: true,
+  refreshInterval: null,
+  orders: [],
+  chefs: [],
+  deliverers: [],
+  customers: [],
+  cities: [],
+  stats: {},
+  lastUpdate: null
+};
+
+// Initialize
+async function init() {
+  await loadData();
+  startAutoRefresh();
+  renderStats();
+  render();
+}
+
+// Auto-refresh every 5 seconds
+function startAutoRefresh() {
+  if (state.refreshInterval) clearInterval(state.refreshInterval);
+  
+  if (state.autoRefresh) {
+    state.refreshInterval = setInterval(async () => {
+      await loadData();
+      renderStats();
+      if (state.tab === 'overview' || state.tab === 'orders') {
+        render();
+      }
+    }, 5000);
+  }
+}
+
+// Load all data
+async function loadData() {
+  try {
+    // Load orders with all relationships
+    const { data: orders } = await adminSupabase
+      .from('orders')
+      .select(`
+        *,
+        customers(*),
+        cities(*),
+        deliverers(*),
+        order_items(*, menu(*), chefs(*))
+      `)
+      .order('created_at', { ascending: false })
+      .limit(100);
+    
+    state.orders = orders || [];
+    
+    // Load all partners
+    const { data: chefs } = await adminSupabase.from('chefs').select('*');
+    const { data: deliverers } = await adminSupabase.from('deliverers').select('*');
+    const { data: customers } = await adminSupabase.from('customers').select('*');
+    const { data: cities } = await adminSupabase.from('cities').select('*');
+    
+    state.chefs = chefs || [];
+    state.deliverers = deliverers || [];
+    state.customers = customers || [];
+    state.cities = cities || [];
+    
+    state.lastUpdate = new Date();
+    
+    // Calculate stats
+    calculateStats();
+    
+  } catch (error) {
+    console.error('Error loading data:', error);
+    showToast('Error loading data', 'error');
+  }
+}
+
+function calculateStats() {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  
+  // Active orders
+  const activeOrders = state.orders.filter(o => 
+    ['placed', 'accepted', 'prepared', 'picked_up'].includes(o.current_status)
+  );
+  
+  // Orders today
+  const todayOrders = state.orders.filter(o => 
+    new Date(o.created_at) >= today
+  );
+  
+  // Revenue today
+  const todayRevenue = todayOrders
+    .filter(o => o.current_status === 'delivered')
+    .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+  
+  // Revenue this month
+  const monthOrders = state.orders.filter(o => 
+    new Date(o.created_at) >= thisMonth && o.current_status === 'delivered'
+  );
+  const monthRevenue = monthOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+  
+  // Active partners
+  const activeChefs = state.chefs.filter(c => c.is_active).length;
+  const activeDeliverers = state.deliverers.filter(d => d.is_available).length;
+  
+  // Pending fees
+  const pendingFees = calculatePendingFees();
+  
+  state.stats = {
+    activeOrders: activeOrders.length,
+    newOrders: activeOrders.filter(o => o.current_status === 'placed').length,
+    todayOrders: todayOrders.length,
+    todayRevenue,
+    monthRevenue,
+    activeChefs,
+    activeDeliverers,
+    totalCustomers: state.customers.length,
+    pendingFees,
+    issues: identifyIssues().length
+  };
+}
+
+function calculatePendingFees() {
+  const now = new Date();
+  const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  
+  let total = 0;
+  
+  // Chef fees (self-deliveries)
+  state.chefs.forEach(chef => {
+    if (chef.fee_paid_this_month) return;
+    
+    const deliveries = state.orders.filter(o => 
+      o.delivered_by_chef_id === chef.chef_id &&
+      o.current_status === 'delivered' &&
+      new Date(o.created_at) >= new Date(thisMonth)
+    ).length;
+    
+    total += deliveries * 10;
+  });
+  
+  // Delivery partner fees
+  state.deliverers.forEach(deliverer => {
+    if (deliverer.fee_paid_this_month) return;
+    
+    const deliveries = state.orders.filter(o => 
+      o.delivery_person_id === deliverer.deliverer_id &&
+      o.current_status === 'delivered' &&
+      new Date(o.created_at) >= new Date(thisMonth)
+    ).length;
+    
+    total += deliveries * 10;
+  });
+  
+  return total;
+}
+
+function identifyIssues() {
+  const issues = [];
+  const now = Date.now();
+  
+  state.orders.forEach(order => {
+    const orderTime = new Date(order.created_at).getTime();
+    const ageMinutes = (now - orderTime) / 60000;
+    
+    // Orders stuck in "placed" for > 5 minutes
+    if (order.current_status === 'placed' && ageMinutes > 5) {
+      issues.push({
+        type: 'stuck_order',
+        severity: 'high',
+        order: order,
+        message: `Order #${order.order_id} not accepted (${Math.floor(ageMinutes)} min old)`
+      });
+    }
+    
+    // Orders in "accepted" for > 30 minutes
+    if (order.current_status === 'accepted' && ageMinutes > 30) {
+      issues.push({
+        type: 'slow_preparation',
+        severity: 'medium',
+        order: order,
+        message: `Order #${order.order_id} preparing too long (${Math.floor(ageMinutes)} min)`
+      });
+    }
+    
+    // Orders ready but no delivery partner for > 10 minutes
+    if (order.current_status === 'prepared' && !order.delivery_person_id && ageMinutes > 10) {
+      issues.push({
+        type: 'no_delivery',
+        severity: 'high',
+        order: order,
+        message: `Order #${order.order_id} needs delivery partner (${Math.floor(ageMinutes)} min waiting)`
+      });
+    }
+  });
+  
+  return issues;
+}
+
+function renderStats() {
+  const html = `
+    <div class="stat-card live success">
+      <div class="stat-label">Active Orders</div>
+      <div class="stat-value">${state.stats.activeOrders || 0}</div>
+      <div class="stat-detail">${state.stats.newOrders || 0} new orders pending</div>
+    </div>
+    
+    <div class="stat-card info">
+      <div class="stat-label">Today's Orders</div>
+      <div class="stat-value">${state.stats.todayOrders || 0}</div>
+      <div class="stat-detail">₹${(state.stats.todayRevenue || 0).toFixed(0)} revenue</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-label">This Month</div>
+      <div class="stat-value">₹${(state.stats.monthRevenue || 0).toFixed(0)}</div>
+      <div class="stat-detail">${state.orders.filter(o => o.current_status === 'delivered').length} delivered</div>
+    </div>
+    
+    <div class="stat-card warning">
+      <div class="stat-label">Pending Fees</div>
+      <div class="stat-value">₹${(state.stats.pendingFees || 0).toFixed(0)}</div>
+      <div class="stat-detail">From partners</div>
+    </div>
+    
+    <div class="stat-card ${state.stats.issues > 0 ? 'danger' : ''}">
+      <div class="stat-label">Issues</div>
+      <div class="stat-value">${state.stats.issues || 0}</div>
+      <div class="stat-detail">${state.stats.issues > 0 ? 'Needs attention' : 'All good'}</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-label">Partners</div>
+      <div class="stat-value">${(state.stats.activeChefs || 0) + (state.stats.activeDeliverers || 0)}</div>
+      <div class="stat-detail">${state.stats.activeChefs} chefs, ${state.stats.activeDeliverers} delivery</div>
+    </div>
+  `;
+  
+  document.getElementById('statsGrid').innerHTML = html;
+}
+
+window.switchTab = function(tab) {
+  state.tab = tab;
+  
+  document.querySelectorAll('.tab').forEach(el => {
+    el.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  
+  render();
+}
+
+function render() {
+  const content = document.getElementById('tabContent');
+  
+  switch(state.tab) {
+    case 'overview':
+      renderOverview(content);
+      break;
+    case 'orders':
+      renderOrders(content);
+      break;
+    case 'partners':
+      renderPartners(content);
+      break;
+    case 'customers':
+      renderCustomers(content);
+      break;
+    case 'issues':
+      renderIssues(content);
+      break;
+    case 'notifications':
+      renderNotifications(content);
+      break;
+  }
+}
+
+function renderOverview(content) {
+  const issues = identifyIssues();
+  const activeOrders = state.orders.filter(o => 
+    ['placed', 'accepted', 'prepared', 'picked_up'].includes(o.current_status)
+  );
+  
+  let html = '';
+  
+  // Issues section
+  if (issues.length > 0) {
+    html += `
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">⚠️ Issues Requiring Attention (${issues.length})</div>
+        </div>
+        ${issues.map(issue => `
+          <div class="order-card" style="border-color: var(--danger);">
+            <div class="order-header">
+              <div>
+                <div class="order-id">${issue.message}</div>
+                <div class="order-meta">
+                  Customer: ${issue.order.customers?.name || 'Unknown'} • 
+                  ${issue.order.customers?.phone || ''}
+                </div>
+              </div>
+              <div class="badge ${issue.order.current_status}">${issue.order.current_status}</div>
+            </div>
+            <div class="order-actions">
+              <button class="btn btn-info" onclick="viewOrderDetails(${issue.order.order_id})">View Details</button>
+              <button class="btn btn-warning" onclick="notifyPartner(${issue.order.order_id})">Notify Partner</button>
+              <button class="btn btn-danger" onclick="cancelOrder(${issue.order.order_id})">Cancel Order</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  
+  // Active orders
+  html += `
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">📦 Active Orders (${activeOrders.length})</div>
+        <button class="btn btn-secondary" onclick="switchTab('orders')">View All</button>
+      </div>
+  `;
+  
+  if (activeOrders.length === 0) {
+    html += '<div class="empty-state"><div class="empty-icon">📦</div><p>No active orders</p></div>';
+  } else {
+    activeOrders.slice(0, 10).forEach(order => {
+      const ageMinutes = Math.floor((Date.now() - new Date(order.created_at).getTime()) / 60000);
+      
+      html += `
+        <div class="order-card ${order.current_status === 'placed' ? 'new-order' : ''}">
+          <div class="order-header">
+            <div>
+              <div class="order-id">Order #${order.order_id}</div>
+              <div class="order-meta">
+                ${order.customers?.name || 'Customer'} • 
+                ${order.customers?.phone || ''} • 
+                ${ageMinutes} min ago
+              </div>
+            </div>
+            <div class="badge ${order.current_status}">${order.current_status}</div>
+          </div>
+          
+          <div class="order-items">
+            ${(order.order_items || []).map(item => 
+              `<div class="order-item">• ${item.menu?.item_name || 'Item'} x${item.quantity} (${item.chefs?.name || 'Chef'})</div>`
+            ).join('')}
+          </div>
+          
+          <div class="order-meta">
+            Total: ₹${order.total_amount} • 
+            ${order.delivery_type === 'delivery' ? '🛵 Delivery' : '🏃 Self Pickup'}
+          </div>
+          
+          <div class="order-actions">
+            <button class="btn btn-info" onclick="viewOrderDetails(${order.order_id})">Details</button>
+            <button class="btn btn-warning" onclick="notifyPartner(${order.order_id})">Notify</button>
+          </div>
+        </div>
+      `;
+    });
+  }
+  
+  html += '</div>';
+  
+  content.innerHTML = html;
+}
+
+function renderOrders(content) {
+  const filterButtons = `
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterOrders('all')">All</button>
+      <button class="filter-btn" onclick="filterOrders('placed')">New</button>
+      <button class="filter-btn" onclick="filterOrders('accepted')">Accepted</button>
+      <button class="filter-btn" onclick="filterOrders('prepared')">Ready</button>
+      <button class="filter-btn" onclick="filterOrders('picked_up')">Out for Delivery</button>
+      <button class="filter-btn" onclick="filterOrders('delivered')">Delivered</button>
+      <button class="filter-btn" onclick="filterOrders('cancelled')">Cancelled</button>
+    </div>
+  `;
+  
+  let html = `
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">📦 All Orders (${state.orders.length})</div>
+      </div>
+      ${filterButtons}
+      <input type="text" class="search-box" placeholder="Search by order ID, customer name, or phone..." id="orderSearch" onkeyup="searchOrders()">
+  `;
+  
+  state.orders.forEach(order => {
+    const ageMinutes = Math.floor((Date.now() - new Date(order.created_at).getTime()) / 60000);
+    const orderDate = new Date(order.created_at).toLocaleString();
+    
+    html += `
+      <div class="order-card order-item-card" data-status="${order.current_status}" data-search="${order.order_id} ${order.customers?.name} ${order.customers?.phone}">
+        <div class="order-header">
+          <div>
+            <div class="order-id">Order #${order.order_id}</div>
+            <div class="order-meta">
+              ${order.customers?.name || 'Customer'} • 
+              ${order.customers?.phone || ''} • 
+              ${orderDate} (${ageMinutes} min ago)
+            </div>
+          </div>
+          <div class="badge ${order.current_status}">${order.current_status}</div>
+        </div>
+        
+        <div class="order-items">
+          ${(order.order_items || []).map(item => 
+            `<div class="order-item">• ${item.menu?.item_name || 'Item'} x${item.quantity} - ₹${item.price_at_order_time} (${item.chefs?.name || 'Chef'})</div>`
+          ).join('')}
+        </div>
+        
+        <div class="order-meta">
+          Total: ₹${order.total_amount} • 
+          ${order.delivery_type === 'delivery' ? '🛵 Delivery' : '🏃 Self Pickup'} • 
+          ${order.cities?.city_name || 'City'}
+          ${order.deliverers ? ` • Delivery: ${order.deliverers.name}` : ''}
+        </div>
+        
+        <div class="order-actions">
+          <button class="btn btn-info" onclick="viewOrderDetails(${order.order_id})">Details</button>
+          <button class="btn btn-warning" onclick="notifyPartner(${order.order_id})">Notify</button>
+          ${order.current_status !== 'delivered' && order.current_status !== 'cancelled' ? 
+            `<button class="btn btn-danger" onclick="cancelOrder(${order.order_id})">Cancel</button>` : ''}
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  content.innerHTML = html;
+}
+
+window.filterOrders = function(status) {
+  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  document.querySelectorAll('.order-item-card').forEach(card => {
+    if (status === 'all' || card.dataset.status === status) {
+      card.style.display = 'block';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+window.searchOrders = function() {
+  const query = document.getElementById('orderSearch').value.toLowerCase();
+  
+  document.querySelectorAll('.order-item-card').forEach(card => {
+    const searchText = card.dataset.search.toLowerCase();
+    card.style.display = searchText.includes(query) ? 'block' : 'none';
+  });
+}
+
+function renderPartners(content) {
+  let html = `
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">👨‍🍳 Chefs (${state.chefs.length})</div>
+      </div>
+  `;
+  
+  state.chefs.forEach(chef => {
+    const city = state.cities.find(c => c.city_id === chef.city_id);
+    const activeOrders = state.orders.filter(o => 
+      o.order_items?.some(item => item.chef_id === chef.chef_id) &&
+      ['placed', 'accepted', 'prepared'].includes(o.current_status)
+    ).length;
+    
+    html += `
+      <div class="partner-row">
+        <div class="partner-info">
+          <div class="partner-name">${chef.name}</div>
+          <div class="partner-details">
+            ${chef.phone} • ${city?.city_name || 'Unknown City'} • 
+            ${activeOrders} active orders
+            ${chef.fcm_token ? ' • <span class="status-indicator online"><span class="status-dot"></span>Online</span>' : ' • <span class="status-indicator offline"><span class="status-dot"></span>Offline</span>'}
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="notifyUser('chef', ${chef.chef_id}, '${chef.name}')">Send Message</button>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  
+  html += `
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">🛵 Delivery Partners (${state.deliverers.length})</div>
+      </div>
+  `;
+  
+  state.deliverers.forEach(deliverer => {
+    const city = state.cities.find(c => c.city_id === deliverer.city_id);
+    const activeOrders = state.orders.filter(o => 
+      o.delivery_person_id === deliverer.deliverer_id &&
+      ['prepared', 'picked_up'].includes(o.current_status)
+    ).length;
+    
+    html += `
+      <div class="partner-row">
+        <div class="partner-info">
+          <div class="partner-name">${deliverer.name}</div>
+          <div class="partner-details">
+            ${deliverer.phone} • ${city?.city_name || 'Unknown City'} • 
+            ${activeOrders} active deliveries
+            ${deliverer.fcm_token ? ' • <span class="status-indicator online"><span class="status-dot"></span>Online</span>' : ' • <span class="status-indicator offline"><span class="status-dot"></span>Offline</span>'}
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="notifyUser('deliverer', ${deliverer.deliverer_id}, '${deliverer.name}')">Send Message</button>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  
+  content.innerHTML = html;
+}
+
+function renderCustomers(content) {
+  let html = `
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">🙋 Customers (${state.customers.length})</div>
+      </div>
+      <input type="text" class="search-box" placeholder="Search customers..." id="customerSearch" onkeyup="searchCustomers()">
+  `;
+  
+  state.customers.forEach(customer => {
+    const city = state.cities.find(c => c.city_id === customer.city_id);
+    const orderCount = state.orders.filter(o => o.customer_id === customer.customer_id).length;
+    const totalSpent = state.orders
+      .filter(o => o.customer_id === customer.customer_id && o.current_status === 'delivered')
+      .reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+    
+    html += `
+      <div class="partner-row customer-row" data-search="${customer.name} ${customer.phone}">
+        <div class="partner-info">
+          <div class="partner-name">${customer.name}</div>
+          <div class="partner-details">
+            ${customer.phone} • ${city?.city_name || 'Unknown'} • 
+            ${orderCount} orders • ₹${totalSpent.toFixed(0)} total
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="notifyUser('customer', ${customer.customer_id}, '${customer.name}')">Send Message</button>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  content.innerHTML = html;
+}
+
+window.searchCustomers = function() {
+  const query = document.getElementById('customerSearch').value.toLowerCase();
+  
+  document.querySelectorAll('.customer-row').forEach(row => {
+    const searchText = row.dataset.search.toLowerCase();
+    row.style.display = searchText.includes(query) ? 'flex' : 'none';
+  });
+}
+
+function renderIssues(content) {
+  const issues = identifyIssues();
+  
+  let html = `
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">⚠️ Issues (${issues.length})</div>
+      </div>
+  `;
+  
+  if (issues.length === 0) {
+    html += '<div class="empty-state"><div class="empty-icon">✅</div><p>No issues detected</p></div>';
+  } else {
+    issues.forEach(issue => {
+      html += `
+        <div class="order-card" style="border-color: var(--${issue.severity === 'high' ? 'danger' : 'warning'});">
+          <div class="order-header">
+            <div>
+              <div class="order-id">${issue.message}</div>
+              <div class="order-meta">
+                Customer: ${issue.order.customers?.name || 'Unknown'} • ${issue.order.customers?.phone || ''}
+              </div>
+            </div>
+            <div class="badge ${issue.order.current_status}">${issue.order.current_status}</div>
+          </div>
+          
+          <div class="order-items">
+            ${(issue.order.order_items || []).map(item => 
+              `<div class="order-item">• ${item.menu?.item_name || 'Item'} x${item.quantity} (${item.chefs?.name || 'Chef'})</div>`
+            ).join('')}
+          </div>
+          
+          <div class="order-actions">
+            <button class="btn btn-info" onclick="viewOrderDetails(${issue.order.order_id})">View Details</button>
+            <button class="btn btn-warning" onclick="notifyPartner(${issue.order.order_id})">Notify Partner</button>
+            <button class="btn btn-danger" onclick="cancelOrder(${issue.order.order_id})">Cancel Order</button>
+          </div>
+        </div>
+      `;
+    });
+  }
+  
+  html += '</div>';
+  content.innerHTML = html;
+}
+
+function renderNotifications(content) {
+  let html = `
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">📢 Send Notifications</div>
+      </div>
+      <p style="margin-bottom: 20px; color: var(--text-light);">
+        Send instant notifications to chefs, delivery partners, or customers. Use this for announcements, reminders, or urgent messages.
+      </p>
+      <button class="btn btn-primary" onclick="openNotificationModal()" style="width: 100%;">
+        📢 Compose New Notification
+      </button>
+    </div>
+  `;
+  
+  content.innerHTML = html;
+}
+
+// Notification functions
+window.openNotificationModal = function() {
+  document.getElementById('notificationModal').classList.add('show');
+  updateNotificationPreview();
+  
+  // Setup target change listener
+  document.getElementById('notifTarget').onchange = handleTargetChange;
+  document.getElementById('notifTitle').oninput = updateNotificationPreview;
+  document.getElementById('notifMessage').oninput = updateNotificationPreview;
+}
+
+window.closeNotificationModal = function() {
+  document.getElementById('notificationModal').classList.remove('show');
+}
+
+function handleTargetChange() {
+  const target = document.getElementById('notifTarget').value;
+  const specificGroup = document.getElementById('specificUserGroup');
+  const specificSelect = document.getElementById('specificUserId');
+  
+  if (target.startsWith('specific_')) {
+    specificGroup.classList.remove('hidden');
+    
+    // Populate dropdown
+    specificSelect.innerHTML = '';
+    
+    if (target === 'specific_chef') {
+      state.chefs.forEach(chef => {
+        const option = document.createElement('option');
+        option.value = chef.chef_id;
+        option.textContent = `${chef.name} (${chef.phone})`;
+        specificSelect.appendChild(option);
+      });
+    } else if (target === 'specific_deliverer') {
+      state.deliverers.forEach(deliverer => {
+        const option = document.createElement('option');
+        option.value = deliverer.deliverer_id;
+        option.textContent = `${deliverer.name} (${deliverer.phone})`;
+        specificSelect.appendChild(option);
+      });
+    } else if (target === 'specific_customer') {
+      state.customers.forEach(customer => {
+        const option = document.createElement('option');
+        option.value = customer.customer_id;
+        option.textContent = `${customer.name} (${customer.phone})`;
+        specificSelect.appendChild(option);
+      });
+    }
+  } else {
+    specificGroup.classList.add('hidden');
+  }
+}
+
+function updateNotificationPreview() {
+  const title = document.getElementById('notifTitle').value || 'Title will appear here';
+  const message = document.getElementById('notifMessage').value || 'Message will appear here';
+  
+  document.getElementById('previewTitle').textContent = title;
+  document.getElementById('previewMessage').textContent = message;
+}
+
+window.sendNotification = async function() {
+  const target = document.getElementById('notifTarget').value;
+  const title = document.getElementById('notifTitle').value.trim();
+  const message = document.getElementById('notifMessage').value.trim();
+  
+  if (!title || !message) {
+    showToast('Please enter title and message', 'error');
+    return;
+  }
+  
+  try {
+    let recipients = [];
+    
+    if (target === 'all_chefs') {
+      recipients = state.chefs.filter(c => c.fcm_token).map(c => ({ token: c.fcm_token, name: c.name }));
+    } else if (target === 'all_deliverers') {
+      recipients = state.deliverers.filter(d => d.fcm_token).map(d => ({ token: d.fcm_token, name: d.name }));
+    } else if (target === 'all_customers') {
+      recipients = state.customers.filter(c => c.fcm_token).map(c => ({ token: c.fcm_token, name: c.name }));
+    } else if (target.startsWith('specific_')) {
+      const userId = parseInt(document.getElementById('specificUserId').value);
+      let user;
+      
+      if (target === 'specific_chef') {
+        user = state.chefs.find(c => c.chef_id === userId);
+      } else if (target === 'specific_deliverer') {
+        user = state.deliverers.find(d => d.deliverer_id === userId);
+      } else if (target === 'specific_customer') {
+        user = state.customers.find(c => c.customer_id === userId);
+      }
+      
+      if (user && user.fcm_token) {
+        recipients = [{ token: user.fcm_token, name: user.name }];
+      }
+    }
+    
+    if (recipients.length === 0) {
+      showToast('No recipients with FCM tokens found', 'warning');
+      return;
+    }
+    
+    // Send notifications
+    let successCount = 0;
+    for (const recipient of recipients) {
+      try {
+        const response = await fetch('https://zjuugofcrnieigciaclb.supabase.co/functions/v1/send-notification', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdXVnb2Zjcm5pZWlnY2lhY2xiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzY4ODYsImV4cCI6MjA4NTU1Mjg4Nn0.pAMtzCz5aM7vxGT_ZVK7TPzumdFXoroQfxaCUt8xmVI'
+          },
+          body: JSON.stringify({
+            fcmToken: recipient.token,
+            title: title,
+            message: message
+          })
+        });
+        
+        if (response.ok) successCount++;
+      } catch (error) {
+        console.error(`Failed to send to ${recipient.name}:`, error);
+      }
+    }
+    
+    closeNotificationModal();
+    showToast(`Sent ${successCount} of ${recipients.length} notifications`, 'success');
+    
+    // Clear form
+    document.getElementById('notifTitle').value = '';
+    document.getElementById('notifMessage').value = '';
+    
+  } catch (error) {
+    console.error('Error sending notifications:', error);
+    showToast('Error sending notifications', 'error');
+  }
+}
+
+window.notifyUser = function(type, id, name) {
+  document.getElementById('notificationModal').classList.add('show');
+  
+  if (type === 'chef') {
+    document.getElementById('notifTarget').value = 'specific_chef';
+  } else if (type === 'deliverer') {
+    document.getElementById('notifTarget').value = 'specific_deliverer';
+  } else if (type === 'customer') {
+    document.getElementById('notifTarget').value = 'specific_customer';
+  }
+  
+  handleTargetChange();
+  document.getElementById('specificUserId').value = id;
+  document.getElementById('notifTitle').value = `Message for ${name}`;
+  updateNotificationPreview();
+}
+
+window.notifyPartner = function(orderId) {
+  const order = state.orders.find(o => o.order_id === orderId);
+  if (!order) return;
+  
+  // Determine who to notify based on order status
+  if (order.current_status === 'placed') {
+    // Notify chef
+    const chefId = order.order_items[0]?.chef_id;
+    const chef = state.chefs.find(c => c.chef_id === chefId);
+    if (chef) {
+      notifyUser('chef', chef.chef_id, chef.name);
+      document.getElementById('notifTitle').value = '⚡ Urgent: New Order Waiting';
+      document.getElementById('notifMessage').value = `Order #${orderId} has been waiting for ${Math.floor((Date.now() - new Date(order.created_at).getTime()) / 60000)} minutes. Please accept or reject immediately.`;
+      updateNotificationPreview();
+    }
+  } else if (order.current_status === 'prepared' && !order.delivery_person_id) {
+    // Notify all delivery partners in the city
+    document.getElementById('notificationModal').classList.add('show');
+    document.getElementById('notifTarget').value = 'all_deliverers';
+    document.getElementById('notifTitle').value = '🛵 Delivery Needed';
+    document.getElementById('notifMessage').value = `Order #${orderId} is ready for pickup in ${order.cities?.city_name}. ₹40 earning opportunity!`;
+    updateNotificationPreview();
+  }
+}
+
+window.viewOrderDetails = function(orderId) {
+  const order = state.orders.find(o => o.order_id === orderId);
+  if (!order) return;
+  
+  const details = `
+    <div style="background: var(--bg); padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+      <h3>Order #${order.order_id}</h3>
+      <p><strong>Status:</strong> <span class="badge ${order.current_status}">${order.current_status}</span></p>
+      <p><strong>Customer:</strong> ${order.customers?.name} (${order.customers?.phone})</p>
+      <p><strong>Address:</strong> ${order.customers?.address}</p>
+      <p><strong>City:</strong> ${order.cities?.city_name}</p>
+      <p><strong>Delivery Type:</strong> ${order.delivery_type}</p>
+      <p><strong>Created:</strong> ${new Date(order.created_at).toLocaleString()}</p>
+      <p><strong>Total:</strong> ₹${order.total_amount}</p>
+    </div>
+    
+    <h4>Items:</h4>
+    ${(order.order_items || []).map(item => `
+      <div style="padding: 8px; border-bottom: 1px solid var(--border);">
+        ${item.menu?.item_name} x${item.quantity} - ₹${item.price_at_order_time}<br>
+        <small>Chef: ${item.chefs?.name} (${item.chefs?.phone})</small>
+      </div>
+    `).join('')}
+    
+    ${order.deliverers ? `
+      <h4 style="margin-top: 16px;">Delivery Partner:</h4>
+      <p>${order.deliverers.name} (${order.deliverers.phone})</p>
+    ` : ''}
+    
+    <div style="margin-top: 24px; display: flex; gap: 12px;">
+      <button class="btn btn-warning" onclick="notifyPartner(${order.order_id}); closeIssueModal();">Notify</button>
+      ${order.current_status !== 'delivered' && order.current_status !== 'cancelled' ? 
+        `<button class="btn btn-danger" onclick="cancelOrder(${order.order_id}); closeIssueModal();">Cancel Order</button>` : ''}
+      <button class="btn btn-secondary" onclick="closeIssueModal()">Close</button>
+    </div>
+  `;
+  
+  document.getElementById('issueDetails').innerHTML = details;
+  document.getElementById('issueModal').classList.add('show');
+}
+
+window.closeIssueModal = function() {
+  document.getElementById('issueModal').classList.remove('show');
+}
+
+window.cancelOrder = async function(orderId) {
+  if (!confirm(`Are you sure you want to cancel order #${orderId}?`)) return;
+  
+  try {
+    await adminSupabase.from('orders').update({ current_status: 'cancelled' }).eq('order_id', orderId);
+    await adminSupabase.from('order_status_history').insert({
+      order_id: orderId,
+      status: 'cancelled',
+      changed_by: 'system'
+    });
+    
+    showToast('Order cancelled', 'success');
+    loadData();
+    render();
+  } catch (error) {
+    console.error('Error cancelling order:', error);
+    showToast('Error cancelling order', 'error');
+  }
+}
+
+window.openPaymentModal = function() {
+  // Implementation for payment management
+  showToast('Payment management coming soon', 'info');
+}
+
+window.logout = function() {
+  if (confirm('Are you sure you want to logout?')) {
+    window.location.reload();
+  }
+}
+
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'slideUp 0.3s ease-out reverse';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// Initialize on load
+init();
+</script>
+
+</body>
+</html>

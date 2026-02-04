@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pahad Food</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #000;
+  --accent: #d4af37;
+  --text: #1a1a1a;
+  --text-light: #666;
+  --bg: #fafafa;
+  --card-bg: #fff;
+  --border: #e8e8e8;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body { 
+  font-family: 'Inter', sans-serif; 
+  background: var(--bg); 
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.header { 
+  background: var(--card-bg);
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo { 
+  font-family: 'DM Serif Display', serif; 
+  font-size: 22px;
+  letter-spacing: 0.5px;
+  color: var(--primary);
+}
+
+.location-selector {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
+  max-width: 500px;
+  margin: 0 16px;
+}
+
+.location-selector select {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card-bg);
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.location-selector select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.cart-icon {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--accent);
+  color: var(--primary);
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  padding-bottom: 80px;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.menu-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.menu-card:active {
+  transform: scale(0.98);
+}
+
+.menu-img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: #f0f0f0;
+}
+
+.menu-info {
+  padding: 10px;
+}
+
+.menu-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.menu-price {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+
+.add-btn {
+  width: 100%;
+  padding: 8px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-btn:active {
+  background: #333;
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.qty-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.qty-btn:active {
+  background: var(--bg);
+}
+
+.qty-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.qty-display {
+  flex: 1;
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 100;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+}
+
+.nav-item {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  border-top: 2px solid transparent;
+  transition: all 0.2s;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.nav-item.active {
+  color: var(--primary);
+  border-top-color: var(--primary);
+}
+
+.nav-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin: 0 auto 4px;
+}
+
+.cart-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+  transform: translateY(100%);
+  transition: transform 0.3s;
+  z-index: 200;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-drawer.open {
+  transform: translateY(0);
+}
+
+.cart-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cart-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-cart {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: var(--text-light);
+}
+
+.cart-items {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.cart-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.cart-item-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f0f0f0;
+  flex-shrink: 0;
+}
+
+.cart-item-info {
+  flex: 1;
+}
+
+.cart-item-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.cart-item-price {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.cart-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.cart-total-amount {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.checkout-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.checkout-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkout-page {
+  padding-bottom: 100px;
+}
+
+.section {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--card-bg);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.summary-row.total {
+  font-weight: 600;
+  font-size: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.order-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.order-id {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.order-status {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--bg);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.order-item {
+  font-size: 13px;
+  color: var(--text-light);
+  margin: 4px 0;
+}
+
+.order-total {
+  font-weight: 600;
+  margin-top: 8px;
+  font-size: 15px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-light);
+}
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  opacity: 0.3;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 14px;
+  background: var(--card-bg);
+  color: var(--primary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 12px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.shimmer-card {
+  aspect-ratio: 1;
+  margin-bottom: 12px;
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  z-index: 1000;
+  display: none;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.hidden { display: none !important; }
+
+@media (min-width: 640px) {
+  .menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .header-content {
+    padding: 0 24px;
+  }
+  
+  .container {
+    padding: 24px;
+  }
+  
+  .cart-drawer {
+    left: auto;
+    right: 0;
+    width: 400px;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-content">
+    <div class="logo">PAHAD FOOD</div>
+    <div class="location-selector" id="locationSelector"></div>
+    <div class="cart-icon" onclick="toggleCart()" id="cartIcon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 2L7 6M17 2l2 4M3 6h18l-2 13H5L3 6z"/>
+      </svg>
+      <div class="cart-badge hidden" id="cartBadge">0</div>
+    </div>
+  </div>
+</div>
+
+<div id="app"></div>
+
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h3>Your Cart</h3>
+    <button class="close-cart" onclick="toggleCart()">×</button>
+  </div>
+  <div class="cart-items" id="cartItemsList"></div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span>Total</span>
+      <span class="cart-total-amount" id="cartTotalAmount">₹0</span>
+    </div>
+    <button class="checkout-btn" onclick="checkout()" id="checkoutBtn" disabled>Proceed to Checkout</button>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item active" onclick="switchTab('menu')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <path d="M3 9h18M9 3v18"/>
+    </svg>
+    Menu
+  </div>
+  <div class="nav-item" onclick="switchTab('processing')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 6v6l4 2"/>
+    </svg>
+    Orders
+  </div>
+  <div class="nav-item" onclick="switchTab('history')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M3 3h18v18H3z"/>
+      <path d="M9 9h6M9 13h6M9 17h6"/>
+    </svg>
+    History
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js';
+
+const supabase = window.supabase.createClient(
+  'https://zjuugofcrnieigciaclb.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqdXVnb2Zjcm5pZWlnY2lhY2xiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzY4ODYsImV4cCI6MjA4NTU1Mjg4Nn0.pAMtzCz5aM7vxGT_ZVK7TPzumdFXoroQfxaCUt8xmVI'
+);
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAGYjiyPqt7sNAFND9I22AIs7wGh6gB7pQ",
+  projectId: "pahadfood",
+  messagingSenderId: "93650163842",
+  appId: "1:93650163842:android:afe5f5016e4410fa6ebc9b"
+};
+
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+window.state = { 
+  tab: 'menu', 
+  cart: {}, 
+  cities: [], 
+  chefs: [], 
+  menu: [], 
+  orders: [], 
+  customer: JSON.parse(localStorage.getItem('customer') || '{}'),
+  selectedCity: localStorage.getItem('selectedCity') || null,
+  selectedCityName: localStorage.getItem('selectedCityName') || null,
+  selectedChef: localStorage.getItem('selectedChef') || null,
+  selectedChefName: localStorage.getItem('selectedChefName') || null,
+  loading: true,
+  processingInterval: null,
+  cartOpen: false,
+  checkoutStep: null
+};
+
+async function initFCM() {
+  try {
+    const token = await getToken(messaging, { vapidKey: 'BJCgA4WI7ZNbRXF86toihrZbLABf0XURwSMNXxMQZXnxDJLSkk61cWQ2lJbOFzvrrkWeH-H-DZakZzMQ30adlws' });
+    if (token && state.customer.customer_id) {
+      await supabase.from('customers').update({ fcm_token: token }).eq('customer_id', state.customer.customer_id);
+    }
+  } catch (e) { console.error('FCM error:', e); }
+}
+
+onMessage(messaging, (payload) => {
+  showToast(payload.notification.title);
+  if (state.tab === 'processing') loadOrders();
+});
+
+async function loadCities() {
+  state.loading = true;
+  renderLocationSelector();
+  const { data } = await supabase.from('cities').select('*').eq('is_active', true);
+  state.cities = data || [];
+  state.loading = false;
+  renderLocationSelector();
+  
+  if (state.selectedCity && state.cities.length > 0) {
+    await loadChefs(state.selectedCity);
+    if (state.selectedChef && state.chefs.length > 0) {
+      await loadMenu(state.selectedChef);
+    }
+  }
+}
+
+async function loadChefs(cityId) {
+  state.loading = true;
+  render();
+  const { data } = await supabase.from('chefs').select('*').eq('city_id', cityId).eq('is_active', true);
+  state.chefs = data || [];
+  state.loading = false;
+  renderLocationSelector();
+  render();
+}
+
+async function loadMenu(chefId) {
+  state.loading = true;
+  render();
+  const { data } = await supabase.from('menu').select('*').eq('chef_id', chefId).eq('is_available', true);
+  state.menu = data || [];
+  state.loading = false;
+  render();
+}
+
+async function loadOrders() {
+  if (!state.customer.customer_id) return;
+  const { data } = await supabase.from('orders')
+    .select('*, order_items(*, menu(*))')
+    .eq('customer_id', state.customer.customer_id)
+    .in('current_status', ['placed', 'accepted', 'prepared', 'picked_up'])
+    .order('created_at', { ascending: false });
+  state.orders = data || [];
+  render();
+}
+
+async function loadHistory() {
+  if (!state.customer.customer_id) return;
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const { data } = await supabase.from('orders')
+    .select('*, order_items(*, menu(*))')
+    .eq('customer_id', state.customer.customer_id)
+    .gte('created_at', startOfMonth)
+    .order('created_at', { ascending: false });
+  state.history = data || [];
+  render();
+}
+
+window.switchTab = (tab) => {
+  if (state.processingInterval) {
+    clearInterval(state.processingInterval);
+    state.processingInterval = null;
+  }
+  
+  state.tab = tab;
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', ['menu', 'processing', 'history'][i] === tab);
+  });
+  
+  if (tab === 'processing') {
+    loadOrders();
+    state.processingInterval = setInterval(loadOrders, 5000);
+  }
+  if (tab === 'history') loadHistory();
+  
+  render();
+};
+
+window.updateQty = (itemId, change) => {
+  const current = state.cart[itemId] || 0;
+  const newQty = current + change;
+  if (newQty <= 0) {
+    delete state.cart[itemId];
+  } else {
+    state.cart[itemId] = newQty;
+  }
+  updateCartUI();
+  render();
+};
+
+window.toggleCart = () => {
+  state.cartOpen = !state.cartOpen;
+  document.getElementById('cartDrawer').classList.toggle('open', state.cartOpen);
+  updateCartUI();
+};
+
+window.checkout = () => {
+  const cartTotal = getCartTotal();
+  
+  if (cartTotal < 100) {
+    showToast('Add items worth at least ₹100 to continue');
+    return;
+  }
+  
+  state.checkoutStep = 'details';
+  state.cartOpen = false;
+  document.getElementById('cartDrawer').classList.remove('open');
+  render();
+};
+
+window.placeOrder = async () => {
+  const name = document.getElementById('custName').value;
+  const phone = document.getElementById('custPhone').value;
+  const address = document.getElementById('custAddress').value;
+  const city = state.selectedCity;
+  const deliveryType = document.getElementById('deliveryType').value;
+  const specialInst = document.getElementById('specialInst').value;
+  const deliveryInst = document.getElementById('deliveryInst').value;
+  
+  if (!name || !phone || !address) {
+    showToast('Please fill all required fields');
+    return;
+  }
+  
+  let customerId = state.customer.customer_id;
+  if (!customerId) {
+    const { data: existing } = await supabase.from('customers').select('*').eq('phone', phone).single();
+    if (existing) {
+      customerId = existing.customer_id;
+    } else {
+      const { data: newCustomer } = await supabase.from('customers').insert({ 
+        name, phone, address, city_id: city 
+      }).select().single();
+      customerId = newCustomer.customer_id;
+    }
+    state.customer = { customer_id: customerId, name, phone, address, city_id: city };
+    localStorage.setItem('customer', JSON.stringify(state.customer));
+  } else {
+    await supabase.from('customers').update({ name, phone, address }).eq('customer_id', customerId);
+    state.customer = { ...state.customer, name, phone, address };
+    localStorage.setItem('customer', JSON.stringify(state.customer));
+  }
+  
+  const foodTotal = getCartTotal();
+  const deliveryAmount = deliveryType === 'delivery' ? 50 : 0;
+  const platformFee = deliveryType === 'delivery' ? 10 : 0;
+  const totalAmount = foodTotal + deliveryAmount;
+  
+  const { data: order } = await supabase.from('orders').insert({
+    customer_id: customerId,
+    city_id: city,
+    delivery_type: deliveryType,
+    current_status: 'placed',
+    delivery_amount: deliveryAmount,
+    platform_fee: platformFee,
+    total_amount: totalAmount
+  }).select().single();
+  
+  for (const [itemId, qty] of Object.entries(state.cart)) {
+    const item = state.menu.find(m => m.item_id == itemId);
+    const itemTotal = item.price * qty;
+    const chefAmount = itemTotal;
+    
+    await supabase.from('order_items').insert({
+      order_id: order.order_id,
+      item_id: itemId,
+      chef_id: item.chef_id,
+      quantity: qty,
+      price_at_order_time: item.price,
+      chef_amount: chefAmount
+    });
+  }
+  
+  await supabase.from('order_status_history').insert({
+    order_id: order.order_id,
+    status: 'placed',
+    changed_by: 'customer'
+  });
+  
+  state.cart = {};
+  state.checkoutStep = null;
+  switchTab('processing');
+  showToast('Order placed! Order #' + order.order_id);
+};
+
+window.updateCustomer = async () => {
+  const name = document.getElementById('histName').value;
+  const phone = document.getElementById('histPhone').value;
+  const address = document.getElementById('histAddress').value;
+  
+  if (!state.customer.customer_id) {
+    showToast('Please place an order first');
+    return;
+  }
+  
+  await supabase.from('customers').update({ name, phone, address }).eq('customer_id', state.customer.customer_id);
+  state.customer = { ...state.customer, name, phone, address };
+  localStorage.setItem('customer', JSON.stringify(state.customer));
+  showToast('Details updated');
+};
+
+window.handleCityChange = function(e) {
+  const cityId = e.target.value;
+  state.selectedCity = cityId;
+  state.selectedChef = null;
+  state.selectedChefName = null;
+  state.menu = [];
+  state.cart = {};
+  
+  const cityName = state.cities.find(c => c.city_id == cityId)?.city_name || '';
+  state.selectedCityName = cityName;
+  
+  localStorage.setItem('selectedCity', cityId);
+  localStorage.setItem('selectedCityName', cityName);
+  localStorage.removeItem('selectedChef');
+  localStorage.removeItem('selectedChefName');
+  
+  if (cityId) {
+    loadChefs(cityId);
+  } else {
+    state.chefs = [];
+    renderLocationSelector();
+    render();
+  }
+};
+
+window.handleChefChange = function(e) {
+  const chefId = e.target.value;
+  state.selectedChef = chefId;
+  state.cart = {};
+  
+  const chefName = state.chefs.find(c => c.chef_id == chefId)?.name || '';
+  state.selectedChefName = chefName;
+  
+  localStorage.setItem('selectedChef', chefId);
+  localStorage.setItem('selectedChefName', chefName);
+  
+  if (chefId) {
+    loadMenu(chefId);
+  } else {
+    state.menu = [];
+    render();
+  }
+};
+
+window.updateDeliveryTotal = function() {
+  const deliveryType = document.getElementById('deliveryType').value;
+  const deliveryRow = document.getElementById('deliveryRow');
+  const finalTotal = document.getElementById('finalTotal');
+  
+  const cartTotal = getCartTotal();
+  
+  if (deliveryType === 'self_pickup') {
+    deliveryRow.style.display = 'none';
+    finalTotal.textContent = '₹' + cartTotal;
+  } else {
+    deliveryRow.style.display = 'flex';
+    finalTotal.textContent = '₹' + (cartTotal + 50);
+  }
+};
+
+function getCartTotal() {
+  return Object.entries(state.cart).reduce((sum, [id, qty]) => {
+    const item = state.menu.find(m => m.item_id == id);
+    return sum + (item?.price || 0) * qty;
+  }, 0);
+}
+
+function updateCartUI() {
+  const cartTotal = getCartTotal();
+  const itemCount = Object.values(state.cart).reduce((sum, qty) => sum + qty, 0);
+  
+  document.getElementById('cartBadge').textContent = itemCount;
+  document.getElementById('cartBadge').classList.toggle('hidden', itemCount === 0);
+  document.getElementById('cartTotalAmount').textContent = '₹' + cartTotal;
+  
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  checkoutBtn.disabled = cartTotal < 100;
+  
+  const cartItemsList = document.getElementById('cartItemsList');
+  if (itemCount === 0) {
+    cartItemsList.innerHTML = '<div class="empty-state"><svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2L7 6M17 2l2 4M3 6h18l-2 13H5L3 6z"/></svg><p>Your cart is empty</p></div>';
+  } else {
+    cartItemsList.innerHTML = Object.entries(state.cart).map(([id, qty]) => {
+      const item = state.menu.find(m => m.item_id == id);
+      if (!item) return '';
+      return `<div class="cart-item">
+        <img src="${item.image_url}" alt="${item.item_name}" class="cart-item-img">
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.item_name}</div>
+          <div class="cart-item-price">₹${item.price} × ${qty}</div>
+        </div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="updateQty(${item.item_id}, -1)">−</button>
+          <div class="qty-display">${qty}</div>
+          <button class="qty-btn" onclick="updateQty(${item.item_id}, 1)">+</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function renderLocationSelector() {
+  const container = document.getElementById('locationSelector');
+  
+  let html = '';
+  
+  if (state.loading && state.cities.length === 0) {
+    html = '<div class="shimmer" style="height: 40px; border-radius: 8px;"></div>';
+  } else {
+    html += `<select onchange="handleCityChange(event)">
+      <option value="">Select City</option>`;
+    state.cities.forEach(c => {
+      html += `<option value="${c.city_id}" ${state.selectedCity == c.city_id ? 'selected' : ''}>${c.city_name}</option>`;
+    });
+    html += '</select>';
+    
+    if (state.selectedCity) {
+      if (state.loading && state.chefs.length === 0) {
+        html += '<div class="shimmer" style="height: 40px; border-radius: 8px;"></div>';
+      } else {
+        html += `<select onchange="handleChefChange(event)">
+          <option value="">Select Chef</option>`;
+        state.chefs.forEach(c => {
+          html += `<option value="${c.chef_id}" ${state.selectedChef == c.chef_id ? 'selected' : ''}>${c.name}</option>`;
+        });
+        html += '</select>';
+      }
+    }
+  }
+  
+  container.innerHTML = html;
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.style.display = 'block';
+  setTimeout(() => toast.style.display = 'none', 3000);
+}
+
+function render() {
+  const app = document.getElementById('app');
+  
+  if (state.checkoutStep === 'details') {
+    const items = Object.entries(state.cart).map(([id, qty]) => {
+      const item = state.menu.find(m => m.item_id == id);
+      return `<div class="summary-row"><span>${item.item_name} × ${qty}</span><span>₹${item.price * qty}</span></div>`;
+    }).join('');
+    
+    const cartTotal = getCartTotal();
+    
+    app.innerHTML = `<div class="container checkout-page">
+      <div class="section">
+        <div class="section-title">Order Summary</div>
+        ${items}
+        <div class="summary-row total">Subtotal<span>₹${cartTotal}</span></div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">Your Details</div>
+        <div class="form-group">
+          <label>Name *</label>
+          <input id="custName" value="${state.customer.name || ''}" placeholder="Your name" required>
+        </div>
+        <div class="form-group">
+          <label>Phone *</label>
+          <input id="custPhone" value="${state.customer.phone || ''}" placeholder="10 digit mobile" required>
+        </div>
+        <div class="form-group">
+          <label>Address *</label>
+          <textarea id="custAddress" rows="3" required placeholder="House no, street, landmark">${state.customer.address || ''}</textarea>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">Delivery Option</div>
+        <div class="form-group">
+          <select id="deliveryType" onchange="updateDeliveryTotal()">
+            <option value="delivery">Home Delivery (+₹50)</option>
+            <option value="self_pickup">Pickup from Chef (Free)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Special Instructions (Optional)</label>
+          <textarea id="specialInst" rows="2" placeholder="Any special requests for chef"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Delivery Instructions (Optional)</label>
+          <input id="deliveryInst" placeholder="e.g., Ring the bell twice">
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="summary-row">Food Total<span>₹${cartTotal}</span></div>
+        <div class="summary-row" id="deliveryRow">Delivery<span>₹50</span></div>
+        <div class="summary-row total">Total<span id="finalTotal">₹${cartTotal + 50}</span></div>
+      </div>
+      
+      <button class="btn-primary" onclick="placeOrder()">Place Order</button>
+      <button class="btn-secondary" onclick="state.checkoutStep = null; render();">Back to Menu</button>
+    </div>`;
+    return;
+  }
+  
+  if (state.tab === 'menu') {
+    let html = '<div class="container">';
+    
+    if (state.loading && state.menu.length === 0 && state.selectedChef) {
+      html += '<div class="menu-grid">';
+      for (let i = 0; i < 12; i++) {
+        html += '<div class="shimmer shimmer-card"></div>';
+      }
+      html += '</div>';
+    } else if (state.menu.length === 0) {
+      html += `<div class="empty-state">
+        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M3 9h18M9 3v18"/>
+        </svg>
+        <p>${state.selectedChef ? 'No items available' : 'Select a city and chef to view menu'}</p>
+      </div>`;
+    } else {
+      html += '<div class="menu-grid">';
+      state.menu.forEach(item => {
+        const qty = state.cart[item.item_id] || 0;
+        html += `<div class="menu-card">
+          <img src="${item.image_url}" alt="${item.item_name}" class="menu-img">
+          <div class="menu-info">
+            <div class="menu-name">${item.item_name}</div>
+            <div class="menu-price">₹${item.price}</div>
+            ${qty === 0 ? 
+              `<button class="add-btn" onclick="updateQty(${item.item_id}, 1)">Add to Cart</button>` :
+              `<div class="qty-control">
+                <button class="qty-btn" onclick="updateQty(${item.item_id}, -1)">−</button>
+                <div class="qty-display">${qty}</div>
+                <button class="qty-btn" onclick="updateQty(${item.item_id}, 1)">+</button>
+              </div>`
+            }
+          </div>
+        </div>`;
+      });
+      html += '</div>';
+    }
+    
+    html += '</div>';
+    app.innerHTML = html;
+  }
+  
+  if (state.tab === 'processing') {
+    let html = '<div class="container">';
+    if (state.orders.length === 0) {
+      html += `<div class="empty-state">
+        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+        <p>No active orders</p>
+      </div>`;
+    } else {
+      state.orders.forEach(order => {
+        const statusMap = {
+          placed: 'Order Placed',
+          accepted: 'Accepted',
+          prepared: 'Preparing',
+          picked_up: 'Out for Delivery',
+          delivered: 'Delivered'
+        };
+        html += `<div class="order-card">
+          <div class="order-header">
+            <div class="order-id">Order #${order.order_id}</div>
+            <div class="order-status">${statusMap[order.current_status]}</div>
+          </div>
+          ${order.order_items.map(i => `<div class="order-item">${i.menu.item_name} × ${i.quantity}</div>`).join('')}
+          <div class="order-total">₹${order.total_amount}</div>
+        </div>`;
+      });
+    }
+    html += '</div>';
+    app.innerHTML = html;
+  }
+  
+  if (state.tab === 'history') {
+    let html = '<div class="container">';
+    
+    html += `<div class="section">
+      <div class="section-title">Your Details</div>
+      <div class="form-group">
+        <label>Name</label>
+        <input id="histName" value="${state.customer.name || ''}" placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input id="histPhone" value="${state.customer.phone || ''}" placeholder="10 digit mobile">
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <textarea id="histAddress" rows="3" placeholder="Your address">${state.customer.address || ''}</textarea>
+      </div>
+      <button class="btn-primary" onclick="updateCustomer()">Update Details</button>
+    </div>`;
+    
+    html += '<h3 style="margin: 20px 0 12px; font-size: 18px; font-weight: 600;">This Month\'s Orders</h3>';
+    
+    if ((state.history || []).length === 0) {
+      html += `<div class="empty-state">
+        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <path d="M9 11h6M9 15h3"/>
+        </svg>
+        <p>No orders this month</p>
+      </div>`;
+    } else {
+      (state.history || []).forEach(order => {
+        html += `<div class="order-card">
+          <div class="order-header">
+            <div class="order-id">Order #${order.order_id}</div>
+            <div style="font-size: 12px; color: var(--text-light);">${new Date(order.created_at).toLocaleDateString()}</div>
+          </div>
+          ${order.order_items.map(i => `<div class="order-item">${i.menu.item_name} × ${i.quantity}</div>`).join('')}
+          <div class="order-total">₹${order.total_amount}</div>
+        </div>`;
+      });
+    }
+    
+    html += '</div>';
+    app.innerHTML = html;
+  }
+}
+
+window.supabase = supabase;
+
+loadCities();
+initFCM();
+render();
+</script>
+
+</body>
+</html>
